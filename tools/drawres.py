@@ -1,0 +1,147 @@
+import pandas as pd  
+import numpy as np
+
+import matplotlib.pyplot as plt
+
+#expand experiment
+def generate_expand_wd():
+    file_path = 'output_expand.xlsx'
+    xls = pd.ExcelFile(file_path)    
+    sheet_names = xls.sheet_names
+    with pd.ExcelWriter('with_depth_heatmap.xlsx') as writer:  
+        for sheet_name in sheet_names:
+            arr = pd.read_excel(xls, sheet_name=sheet_name).values[:, 6].reshape(-1, 8)
+            df = pd.DataFrame(arr)
+            df.to_excel(writer, sheet_name=sheet_name, index=False)
+
+
+# depth experiment
+def draw_depth():
+    linewidth = 2
+    file_path = 'output_depth.xlsx'
+    xls = pd.ExcelFile(file_path)
+    sheet_names = ['breastcancer_LogisticLoss_depth', 'breastcancer_sigmoidloss_depth_', \
+    'statlog_LogisticLoss_depth_', 'statlog_SigmoidLoss_depth_', \
+    'ionosphere_LogisticLoss_depth_', 'ionosphere_SigmoidLoss_depth_', \
+    'housevotes_LogisticLoss_depth_', 'housevotes_SigmoidLoss_depth_', \
+    'musk_LogisticLoss_depth_', 'musk_SigmoidLoss_depth_', \
+    'esdrp_logistic', 'esdrp_sigmoid']
+
+    fig, axs = plt.subplots(2, 3, sharex=True, figsize=(12, 6))
+    titles = ['Breast Cancer', 'Statlog', 'Ionosphere', 'Congressional Voting Records', 'Musk', 'Early Stage Diabetes Risk Prediction']
+    markers = ['x', 'o', 'v', 's', 'p', 'P']
+    i = 0
+    x = np.arange(3, 21)
+    for ax in axs.flatten():
+        y1 = pd.read_excel(xls, sheet_name=sheet_names[i * 2]).values[:, 5]
+        ax.plot(x, y1, label='Logistic loss', linewidth = linewidth, linestyle='dashdot', marker = markers[0], markersize=8)
+        y2 = pd.read_excel(xls, sheet_name=sheet_names[i * 2 + 1]).values[:, 5]
+        ax.plot(x, y2, label='Sigmoid loss', linewidth = linewidth, linestyle='dashdot', marker = markers[1], markersize=8)  
+
+        ax.legend()
+        if i % 3 == 0:
+            ax.set_ylabel('Accuracy', fontsize=15)  
+        ax.set_title(titles[i])  
+        if i >= 2:
+            ax.set_xlabel('depth', fontsize=15)
+        ax.grid(ls='--')
+        i += 1
+
+    plt.tight_layout()
+    plt.show()
+
+#width experiment
+def draw_width():
+    linewidth = 2
+    file_path = 'output_width.xlsx'
+    xls = pd.ExcelFile(file_path)
+    sheet_names = ['breastcancer', 'statlog', \
+    'ionosphere', 'housevotes_', \
+    'musk', 'esdrp']
+
+    fig, axs = plt.subplots(2, 3, sharex=True, figsize=(12, 6))
+    titles = ['Breast Cancer', 'Statlog', 'Ionosphere', 'Congressional Voting Records', 'Musk', 'Early Stage Diabetes Risk Prediction']
+    markers = ['x', 'o', 'v', 's', 'p', 'P']
+    i = 0
+    x = np.arange(3, 36)
+    print(x)
+    for ax in axs.flatten():
+        y1 = pd.read_excel(xls, sheet_name=sheet_names[i], header=None).values[:, 0]
+        print(y1)
+        ax.plot(x, y1, label='Logistic loss', linewidth = linewidth, linestyle='dashdot', marker = markers[0], markersize=8)
+        y2 = pd.read_excel(xls, sheet_name=sheet_names[i], header=None).values[:, 1]
+        ax.plot(x, y2, label='Sigmoid loss', linewidth = linewidth, linestyle='dashdot', marker = markers[1], markersize=8)  
+
+        ax.legend()
+        if i % 3 == 0:
+            ax.set_ylabel('Accuracy', fontsize=15)  
+        ax.set_title(titles[i])  
+        if i >= 2:
+            ax.set_xlabel('Width', fontsize=15)
+        ax.grid(ls='--')
+        i += 1
+
+    plt.tight_layout()
+    plt.show()
+
+#swap training strategy
+# linewidth = 2
+# file_path = 'output_swap.xlsx'
+# xls = pd.ExcelFile(file_path)
+# sheet_names = xls.sheet_names
+# titles = ['Breast Cancer', 'Statlog', 'Ionosphere', 'Congressional Voting Records', 'Musk', 'Early Stage Diabetes Risk Prediction']
+# fig, axs = plt.subplots(2, 3, sharex=True, figsize=(12, 6))
+# i = 0
+# x = [0, 0.08, 0.16, 0.24, 0.32, 0.40]
+# for ax in axs.flatten():
+#     if i >= 5:
+#         break
+#     arr =  pd.read_excel(xls, sheet_name=sheet_names[i]).values[:, 7].reshape(-1, 16)
+#     y = np.max(arr, axis=1)
+#     ax.plot(x, y, label='Sigmoid then logistic', linewidth = linewidth, linestyle='--')  
+
+#     ax.legend()
+#     ax.set_ylabel('Accuracy')  
+#     ax.set_title(titles[i])  
+#     if i >= 2:  
+#         ax.set_xlabel('depth')
+#     i += 1
+
+# plt.tight_layout()  
+# plt.show()
+
+#convergence speed with data number
+def draw_data_speed():
+    linewidth = 2
+    file_path = 'output_data_speed.xlsx'
+    xls = pd.ExcelFile(file_path)
+    sheet_names = ['makecircle_', 'makemoon_']
+
+    titles = ['makecircle', 'makemoon']
+    fig, axs = plt.subplots(1, 2, sharex=True, figsize=(12, 4))
+    i = 0
+    x = [500, 1000, 3000, 5000, 7000, 10000]
+    for ax in axs.flatten():
+        if i >= 2:
+            break
+        arr =  pd.read_excel(xls, sheet_name=sheet_names[i]).values[:, 6]
+        logistic_arr = arr[:96].reshape(-1, 6)
+        sigmoid_arr = arr[96:].reshape(-1, 6)
+        logistic_max = np.max(logistic_arr, axis=0)
+        sigmoid_max = np.max(sigmoid_arr, axis=0)
+        ax.plot(x, logistic_max, label='Logistic Loss', linewidth = linewidth, linestyle='-') 
+        ax.plot(x, sigmoid_max, label='Sigmoid Loss', linewidth = linewidth, linestyle='--')
+        
+        ax.legend()
+        ax.set_ylabel('Accuracy')  
+        ax.set_title(titles[i])  
+        ax.set_xlabel('depth')
+        i += 1
+
+    plt.tight_layout()  
+    plt.show()
+
+# generate_expand_wd()
+# draw_data_speed()
+# draw_depth()
+draw_width()
