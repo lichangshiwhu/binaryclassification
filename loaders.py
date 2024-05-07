@@ -1,4 +1,6 @@
 import random
+import os
+import multiprocessing
 
 import torch
 import torch.nn as nn
@@ -7,6 +9,8 @@ import torch.optim as optim
 from torchvision import datasets,transforms
 
 from PIL import Image
+import concurrent.futures 
+from concurrent.futures import ThreadPoolExecutor  
 
 # sklearn
 import sklearn.datasets as skdatasets
@@ -15,6 +19,40 @@ from sklearn.preprocessing import MinMaxScaler
 
 #numpy
 import numpy as np
+
+transform = transforms.Compose([  
+transforms.Resize(256),  
+transforms.CenterCrop(224),  
+transforms.ToTensor(),  
+transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),])
+
+def read_image(img_path, label):
+    try:  
+        img = Image.open(img_path).convert("RGB")
+        img = transform(img)
+        if img is None:  
+            raise ValueError(f"cannot find {img_path}")  
+        return img, label
+    except Exception as e:  
+        print(f"Error:{e} when read {img_path}")  
+        return None, None
+
+def load_images_in_parallel(image_file_tuples, num_threads=4):  
+    images = []
+    labels = []
+    with ThreadPoolExecutor(max_workers=num_threads) as executor:  
+        futures = []
+        for image_file, label in image_file_tuples:
+            future = executor.submit(read_image, image_file, label)  
+            futures.append(future)
+
+        for future in concurrent.futures.as_completed(futures):  
+            img, label = future.result()  
+            if img is not None:  
+                images.append(img)
+                labels.append(label)  
+    return images, labels
+
 
 class AlldataLoader():
     def __init__(self, batchSize = 16):
@@ -32,9 +70,6 @@ class AlldataLoader():
                                                 batch_size=self.batchSize,
                                                 shuffle=False)
         return trainLoader, testLoader
-    
-    def getDataset(self):
-        return self.train_dataset, self.test_dataset
 
     def generateMislabeledData(self, MislabeledNoise = 0):
         if MislabeledNoise != 0:
@@ -84,32 +119,41 @@ class BinaryMNISTLoader(AlldataLoader):
         self.test_dataset.targets[self.test_dataset.targets >= 5] = 1
 
 class CatAndDogLoader(AlldataLoader):
-    def __init__(self, batchSize=16, inputSize = 224*224):
+    def __init__(self, batchSize=16, inputSize = 224*224, MisLabeledNoise = 0, seed = 0):
         super(CatAndDogLoader, self).__init__(batchSize)
         # cannot identify image file: Dog/11702.jpg, Cat/666.jpg 
         # find and delete above pictrures 
-        transform = transforms.Compose([  
-        transforms.Resize(256),  
-        transforms.CenterCrop(224),  
-        transforms.ToTensor(),  
-        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),])
+        self.seed = seed
         dataset = datasets.ImageFolder('./mydataset/kagglecatsanddogs_5340/PetImages', transform = transform) 
+
         x = []
         y = []
-        for image_path, label in dataset.samples:
-            try:
-                image = Image.open(image_path).convert('RGB')
-                image_tensor = transform(image)
-                image.close()
-            except Exception as e:
-                print(f"Error opening image {image_path}: {e}")
-                continue
-            x.append(image_tensor)
-            y.append(label if label == 1 else -1)
-        mydataset = makeClassifictionDataset(x, y)
-        trainSamples = int(0.8 * len(mydataset))
-        testSamples = len(mydataset) - trainSamples
-        self.train_dataset, self.test_dataset = torch.utils.data.random_split(mydataset, [trainSamples, testSamples])
+        for path, label in dataset.samples:
+            _x, _y  = read_image(path, label)
+            if _x is not None:
+                x.append(_x)
+                y.append(_y)
+        # _x, _y = load_images_in_parallel(dataset.samples, multiprocessing.cpu_count())
+        # random.seed(self.seed)
+        # indices = [i for i in range(len(_y))]
+        # random.shuffle(indices)
+        # x = [_x[i] for i in indices]  
+        # y = [_y[i] for i in indices] 
+
+        self.trainSamples = int(0.8 * len(y))
+        self.testSamples = len(y) - self.trainSamples
+        self.train_dataset = makeClassifictionDataset(x[:self.trainSamples], y[:self.trainSamples])
+        self.test_dataset = makeClassifictionDataset(x[self.trainSamples:], y[self.trainSamples:])
+        self.generateMislabeledData(MisLabeledNoise)
+
+    def generateMislabeledData(self, MislabeledNoise = 0):
+        if MislabeledNoise != 0:
+            noiseDataLen = int(len(self.train_dataset) * MislabeledNoise)
+            index = [i for i in range(len(self.train_dataset))]
+            random.shuffle(index)
+            indeices = index[0:noiseDataLen]
+            for i in indeices:
+                self.train_dataset.y[i] = -1 * self.train_dataset.y[i]
 
 class makeClassifictionDataset(torch.utils.data.Dataset):
     def __init__(self, x, y):
@@ -585,7 +629,7 @@ def getLoader(config):
         mnistloader = BinaryMNISTLoader(config['batchSize'], config['noise'])
         return mnistloader.getLoader()
     elif config['loaderName'] == 'CatAndDog':
-        catanddogloader = CatAndDogLoader(config['batchSize'], config['inputSize'])
+        catanddogloader = CatAndDogLoader(batchSize=config['batchSize'], inputSize = 224*224, MisLabeledNoise = config['MisLabeledNoise'], seed = config['datasetSeed'])
         return catanddogloader.getLoader()
     elif config['loaderName'] == 'makeLinearClassifiction':
         makelinearclassifictionloader = makeLinearClassifictionLoader(config['batchSize'], config['trainSamples'], 

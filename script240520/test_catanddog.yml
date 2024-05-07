@@ -5,11 +5,11 @@ modelName: ResNet18
 algorithm: ERM
 lr: 0.01
 momentum: 0.1
+  # - LogisticAndWelschLoss
+  # - LogisticAndSavageLoss
 criterion: 
   - LogisticLoss
   - LogisticAndSigmoidLoss
-  - LogisticAndWelschLoss
-  - LogisticAndSavageLoss
 
 MisLabeledNoise:
   - 0
