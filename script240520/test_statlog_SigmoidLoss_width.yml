@@ -1,0 +1,56 @@
+# model parameters
+modelName: DNN
+
+# algorithm parameters
+algorithm: ERM
+lr: 0.01
+momentum: 0.1
+criterion: LogisticAndSigmoidLoss
+
+MisLabeledNoise: 0
+
+noise: 0
+
+# is input features
+inputSize: 7
+
+width: 
+  - 36
+  - 37
+  - 38
+  - 39
+  - 40
+  - 41
+  - 42
+  - 43
+  - 44
+  - 45
+  - 46
+  - 47
+  - 48
+  - 49
+  - 50
+
+deep: 3
+
+
+outputSize: 1
+tau: 1
+
+# dataset parameters
+batchSize: 16
+trainSamples: 1000
+testSamples: 100
+datasetSeed: 3
+loaderName: statlog
+
+# parameters in main
+epochs: 200
+
+# print parameters
+interval: 2000
+file: rename
+
+# save
+SaveModelName: False
+device: cpu

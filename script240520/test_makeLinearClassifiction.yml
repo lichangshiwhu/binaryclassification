@@ -1,0 +1,68 @@
+# model parameters
+modelName: DNN
+
+# algorithm parameters
+algorithm: ERM
+lr: 0.01
+momentum: 0.1
+criterion: 
+  - LogisticLoss
+  - LogisticAndSigmoidLoss
+  - LogisticAndWelschLoss
+  - LogisticAndSavageLoss
+
+MisLabeledNoise: 0
+
+noise: 0
+
+# is input features
+inputSize: 
+  - 2
+  - 4
+  - 8
+  - 16
+  - 32
+  - 64
+  - 128
+  - 256
+  - 512
+  - 1024
+
+width: 
+  - 3 
+  - 4
+  - 5
+  - 6
+deep: 
+  - 3 
+  - 4
+  - 5
+  - 6
+
+outputSize: 1
+tau: 1
+
+# dataset parameters
+batchSize: 16
+trainSamples:
+  - 500
+  - 1000
+  - 3000
+  - 5000
+  - 7000
+  - 10000
+
+testSamples: 100
+datasetSeed: 3
+loaderName: makeLinearClassifiction
+
+# parameters in main
+epochs: 200
+
+# print parameters
+interval: 2000
+file: rename
+
+# save
+SaveModelName: False
+device: cpu
