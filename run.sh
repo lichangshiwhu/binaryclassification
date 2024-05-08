@@ -42,6 +42,9 @@ python main.py -F ./script240520/test_musk_SigmoidLoss_width.yml -O musk_Sigmoid
 python main.py -F ./script240520/test_statlog_LogisticLoss_width.yml -O statlog_LogisticLoss_width &
 python main.py -F ./script240520/test_statlog_SigmoidLoss_width.yml -O statlog_SigmoidLoss_width &
 
+#run in pratical 
+python main.py -F ./script240520/test_catanddog.yml -O test_catanddog &
+
 wait
 
 echo "Finsh all"
@@ -59,14 +62,3 @@ cp test_earlyStageDiabetesRiskPrediction_LogisticLoss.yml test_earlyStageDiabete
 cp test_earlyStageDiabetesRiskPrediction_SigmoidLoss.yml test_earlyStageDiabetesRiskPrediction_SigmoidLoss_depth.yml
 cp test_statlog_LogisticLoss.yml test_statlog_LogisticLoss_depth.yml
 cp test_statlog_SigmoidLoss.yml test_statlog_SigmoidLoss_depth.yml
-
-  - 11
-  - 12
-  - 13
-  - 14
-  - 15
-  - 16
-  - 17
-  - 18
-  - 19
-  - 20
