@@ -159,6 +159,56 @@ def draw_noise_width35_depth10():
     plt.tight_layout()  
     plt.show()
 
+
+def draw_noise_width6_depth6():
+    linewidth = 2
+    file_path = 'output_noise_W6_D6.xlsx'
+    xls = pd.ExcelFile(file_path)
+    sheet_names = ['breastcancer_noise_', 'statlog_noise_', \
+    'ionosphere_noise_', 'housevotes_noise_', \
+    'musk_noise_', 'earlyStageDiabetesRiskPredictio']
+
+    titles = ['Breast Cancer', 'Statlog', 'Ionosphere', 'Congressional Voting Records', 'Musk', 'Early Stage Diabetes Risk Prediction']
+    nn_numbers = [16, 16, 16, 16, 16, 16]
+    loss_names = ['LogisticLoss', 'Logistic then sigmoid', 'LogisticAndWelschLoss', 'LogisticAndSavageLoss', 'Sigmoid only', 'Sigmoid then logistic']
+    keep_loss = [0, 1, 0, 0, 1, 1]
+    loss_numbers = len(loss_names)
+    fig, axs = plt.subplots(2, 3, sharex=True, figsize=(12, 6))
+    i = 0
+    x = [0, 0.08, 0.16, 0.24, 0.32, 0.40]
+    markers = ['x', 'o', 'v', 's', 'p', 'P']
+
+    for ax in axs.flatten():
+        values =  pd.read_excel(xls, sheet_name=sheet_names[i]).values
+        width = values[:, 1]
+        depth = values[:, 2]
+        all_acc = values[:, 6]
+        loss_acc = all_acc.reshape(-1, len(x), nn_numbers[i])
+        width = width.reshape(-1, len(x), nn_numbers[i])
+        depth = depth.reshape(-1, len(x), nn_numbers[i])
+        # print(loss_acc)
+        assert loss_acc.shape[0] == len(loss_names)
+        y = np.max(loss_acc, axis=2)
+        index = np.argmax(loss_acc, axis=2)
+        print(index.shape)
+        print(width.shape)
+        i_indices, j_indices = np.indices(index.shape)
+        print(f"width:{width[i_indices, j_indices, index]}")
+        print(f"depth:{depth[i_indices, j_indices, index]}")
+        for j in range(len(loss_names)):
+            if keep_loss[j]:
+                ax.plot(x, y[j], label=loss_names[j], linewidth = linewidth, linestyle='dashdot', marker = markers[j], markersize=8)  
+
+        ax.legend()
+        ax.set_ylabel('Accuracy')  
+        ax.set_title(titles[i])  
+        if i >= 3:  
+            ax.set_xlabel('Depth')
+        i += 1
+
+    plt.tight_layout()  
+    plt.show()
+
 #convergence speed with data number
 def draw_data_speed():
     linewidth = 2
@@ -194,5 +244,5 @@ def draw_data_speed():
 # draw_data_speed()
 # draw_depth()
 # draw_width()
-draw_noise_width35_depth10()
-
+# draw_noise_width35_depth10()
+draw_noise_width6_depth6()
