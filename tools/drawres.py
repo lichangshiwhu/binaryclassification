@@ -170,13 +170,13 @@ def draw_noise_width6_depth6():
 
     titles = ['Breast Cancer', 'Statlog', 'Ionosphere', 'Congressional Voting Records', 'Musk', 'Early Stage Diabetes Risk Prediction']
     nn_numbers = [16, 16, 16, 16, 16, 16]
-    loss_names = ['LogisticLoss', 'Logistic then sigmoid', 'LogisticAndWelschLoss', 'LogisticAndSavageLoss', 'Sigmoid only', 'Sigmoid then logistic']
-    keep_loss = [0, 1, 0, 0, 1, 1]
+    loss_names = ['Logistic then sigmoid', 'Sigmoid only', 'Sigmoid then logistic']
+    keep_loss = [1, 1, 1]
     loss_numbers = len(loss_names)
     fig, axs = plt.subplots(2, 3, sharex=True, figsize=(12, 6))
     i = 0
     x = [0, 0.08, 0.16, 0.24, 0.32, 0.40]
-    markers = ['x', 'o', 'v', 's', 'p', 'P']
+    markers = ['o', 'v', 'x', 's', 'p', 'P']
 
     for ax in axs.flatten():
         values =  pd.read_excel(xls, sheet_name=sheet_names[i]).values
@@ -214,27 +214,26 @@ def draw_data_speed():
     linewidth = 2
     file_path = 'output_data_speed.xlsx'
     xls = pd.ExcelFile(file_path)
-    sheet_names = ['makecircle_', 'makemoon_']
+    sheet_names = ['makeCircle_', 'makeMoon_']
 
-    titles = ['makecircle', 'makemoon']
+    titles = ['Makecircle', 'Makemoon']
     fig, axs = plt.subplots(1, 2, sharex=True, figsize=(12, 4))
     i = 0
-    x = [500, 1000, 3000, 5000, 7000, 10000]
+    x = [500,2000,4000,6000,8000,10000,12000,14000,16000,18000,20000,]
+    markers = [ 'x','o','v', 's', 'p', 'P']
     for ax in axs.flatten():
-        if i >= 2:
-            break
         arr =  pd.read_excel(xls, sheet_name=sheet_names[i]).values[:, 6]
-        logistic_arr = arr[:96].reshape(-1, 6)
-        sigmoid_arr = arr[96:].reshape(-1, 6)
+        logistic_arr = arr[:176].reshape(-1, len(x))
+        sigmoid_arr = arr[176:].reshape(-1, len(x))
         logistic_max = np.max(logistic_arr, axis=0)
         sigmoid_max = np.max(sigmoid_arr, axis=0)
-        ax.plot(x, logistic_max, label='Logistic Loss', linewidth = linewidth, linestyle='-') 
-        ax.plot(x, sigmoid_max, label='Sigmoid Loss', linewidth = linewidth, linestyle='--')
+        ax.plot(x, logistic_max, label='Logistic Loss', linewidth = linewidth, linestyle='dashdot', marker = markers[0], markersize=8) 
+        ax.plot(x, sigmoid_max, label='Sigmoid Loss', linewidth = linewidth, linestyle='dashdot', marker = markers[1], markersize=8)
         
         ax.legend()
         ax.set_ylabel('Accuracy')  
         ax.set_title(titles[i])  
-        ax.set_xlabel('depth')
+        ax.set_xlabel('Data number')
         i += 1
 
     plt.tight_layout()  
@@ -245,4 +244,4 @@ def draw_data_speed():
 # draw_depth()
 # draw_width()
 # draw_noise_width35_depth10()
-draw_noise_width6_depth6()
+draw_data_speed()
