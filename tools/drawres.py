@@ -204,6 +204,7 @@ def draw_noise_width6_depth6():
         ax.set_title(titles[i])  
         if i >= 3:  
             ax.set_xlabel('Depth')
+        ax.grid(ls='--')
         i += 1
 
     plt.tight_layout()  
@@ -227,21 +228,22 @@ def draw_data_speed():
         sigmoid_arr = arr[176:].reshape(-1, len(x))
         logistic_max = np.max(logistic_arr, axis=0)
         sigmoid_max = np.max(sigmoid_arr, axis=0)
-        ax.plot(x, logistic_max, label='Logistic Loss', linewidth = linewidth, linestyle='dashdot', marker = markers[0], markersize=8) 
-        ax.plot(x, sigmoid_max, label='Sigmoid Loss', linewidth = linewidth, linestyle='dashdot', marker = markers[1], markersize=8)
+        ax.plot(x, logistic_max, label='Logistic loss', linewidth = linewidth, linestyle='dashdot', marker = markers[0], markersize=8) 
+        ax.plot(x, sigmoid_max, label='Sigmoid loss', linewidth = linewidth, linestyle='dashdot', marker = markers[1], markersize=8)
         
         ax.legend()
         ax.set_ylabel('Accuracy')  
         ax.set_title(titles[i])  
         ax.set_xlabel('Data number')
+        ax.grid(ls='--')
         i += 1
 
     plt.tight_layout()  
     plt.show()
 
 # generate_expand_wd()
-# draw_data_speed()
 # draw_depth()
 # draw_width()
 # draw_noise_width35_depth10()
-draw_data_speed()
+# draw_data_speed()
+draw_noise_width6_depth6()

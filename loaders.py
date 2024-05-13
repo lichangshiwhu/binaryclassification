@@ -20,38 +20,22 @@ from sklearn.preprocessing import MinMaxScaler
 #numpy
 import numpy as np
 
-transform = transforms.Compose([  
-transforms.Resize(256),  
-transforms.CenterCrop(224),  
-transforms.ToTensor(),  
-transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),])
 
-def read_image(img_path, label):
-    try:  
-        img = Image.open(img_path).convert("RGB")
-        img = transform(img)
-        if img is None:  
-            raise ValueError(f"cannot find {img_path}")  
-        return img, label
-    except Exception as e:  
-        print(f"Error:{e} when read {img_path}")  
-        return None, None
+# def load_images_in_parallel(image_file_tuples, num_threads=4):  
+#     images = []
+#     labels = []
+#     with ThreadPoolExecutor(max_workers=num_threads) as executor:  
+#         futures = []
+#         for image_file, label in image_file_tuples:
+#             future = executor.submit(read_image, image_file, label)  
+#             futures.append(future)
 
-def load_images_in_parallel(image_file_tuples, num_threads=4):  
-    images = []
-    labels = []
-    with ThreadPoolExecutor(max_workers=num_threads) as executor:  
-        futures = []
-        for image_file, label in image_file_tuples:
-            future = executor.submit(read_image, image_file, label)  
-            futures.append(future)
-
-        for future in concurrent.futures.as_completed(futures):  
-            img, label = future.result()  
-            if img is not None:  
-                images.append(img)
-                labels.append(label)  
-    return images, labels
+#         for future in concurrent.futures.as_completed(futures):  
+#             img, label = future.result()  
+#             if img is not None:  
+#                 images.append(img)
+#                 labels.append(label)  
+#     return images, labels
 
 
 class AlldataLoader():
@@ -121,32 +105,84 @@ class BinaryMNISTLoader(AlldataLoader):
 class ImageFloderLoader(AlldataLoader):
     def  __init__(self, batchSize=16, inputSize = 224*224, MisLabeledNoise = 0, seed = 0, imagefolder = '', valimagefolder = ''):
         super(ImageFloderLoader, self).__init__(batchSize)
+        self.train_transform = transforms.Compose([  
+        transforms.Resize((256, 256)),  
+        transforms.CenterCrop((224, 224)),  
+        transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),  
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),])
+
+        self.eval_transform = transforms.Compose([  
+        transforms.CenterCrop((224, 224)),  
+        transforms.ToTensor(),  
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),])
+
         # cannot identify image file: Dog/11702.jpg, Cat/666.jpg 
         # find and delete above pictrures 
         self.seed = seed
-        train_x, train_y = self.get_imageandlabels(imagefolder)
+        x, y = self.get_imagepathandlabels(imagefolder)
         if valimagefolder != '':
-            test_x, test_y = self.get_imageandlabels(valimagefolder)
-            self.train_dataset = makeClassifictionDataset(train_x, train_y)
-            self.test_dataset = makeClassifictionDataset(test_x, test_y)
+            train_x, _train_y = x, y
+            test_x, _test_y = self.get_imagepathandlabels(valimagefolder)
         else:
-            self.trainSamples = int(0.8 * len(train_y))
-            self.testSamples = len(train_y) - self.trainSamples
-            self.train_dataset = makeClassifictionDataset(train_x[:self.trainSamples], train_y[:self.trainSamples])
-            self.test_dataset = makeClassifictionDataset(train_x[self.trainSamples:], train_y[self.trainSamples:])
+            self.trainSamples = int(0.8 * len(y))
+            self.testSamples = len(y) - self.trainSamples
+            train_x, _train_y = x[:self.trainSamples], y[:self.trainSamples]
+            test_x, _test_y = x[self.trainSamples:], y[self.trainSamples:]
+
+        train_x, train_y = self.get_imageandlabels(imagepaths=train_x, labels=_train_y, transform=self.train_transform)
+        test_x, test_y = self.get_imageandlabels(imagepaths=test_x, labels=_test_y, transform=self.eval_transform)
+        self.train_dataset = makeClassifictionDataset(train_x, train_y)
+        self.test_dataset = makeClassifictionDataset(test_x, test_y)
         self.generateMislabeledData(MisLabeledNoise)
 
-    def get_imageandlabels(self, imagefloder):
-        dataset = datasets.ImageFolder(imagefloder, transform = transform) 
+    def shuffle_together(self, a, b):  
+        indices = list(range(len(a)))  
+        
+        random.shuffle(indices)  
+        
+        a_shuffled = [a[i] for i in indices]  
+        b_shuffled = [b[i] for i in indices]  
+        
+        return a_shuffled, b_shuffled  
 
-        images = []
+    def get_imagepathandlabels(self, imagefloder):
+        dataset = datasets.ImageFolder(imagefloder)
+        imagepaths = []
         labels = []
         for path, label in dataset.samples:
-            _x, _y  = read_image(path, label)
+            imagepaths.append(path)
+            if label == 1:
+                labels.append(1)
+            elif label == 0:
+                labels.append(-1)
+            else:
+                import sys
+                print("Error labels.")
+                sys.exit(0)
+        imagepaths, labels = self.shuffle_together(imagepaths, labels)
+        return imagepaths, labels
+
+    def get_imageandlabels(self, imagepaths, labels, transform):
+        images = []
+        _labels = []
+        for path, label in list(zip(imagepaths, labels)):
+            _x, _y  = self.read_image(path, label, transform)
             if _x is not None:
                 images.append(_x)
-                labels.append(1 if _y == 1 else -1)
-        return images, labels
+                _labels.append(_y)
+        return images, _labels
+
+    def read_image(self, img_path, label, transform):
+        try:  
+            img = Image.open(img_path)
+            img = transform(img)
+            if img is None:  
+                raise ValueError(f"cannot find {img_path}")  
+            return img, label
+        except Exception as e:  
+            print(f"Error:{e} when read {img_path}")  
+            return None, None
 
     def generateMislabeledData(self, MislabeledNoise = 0):
         if MislabeledNoise != 0:
@@ -160,7 +196,7 @@ class ImageFloderLoader(AlldataLoader):
 class CatAndDogLoader(ImageFloderLoader):
     def __init__(self, batchSize=16, inputSize = 224*224, MisLabeledNoise = 0, seed = 0):
         super(CatAndDogLoader, self).__init__(batchSize=batchSize, inputSize = inputSize, MisLabeledNoise = MisLabeledNoise,
-                                               seed = seed, imagefolder = './mydataset/kagglecatsanddogs_5340/PetImages') 
+                                               seed = seed, imagefolder = './mydataset/catanddog/kagglecatsanddogs_3367a/PetImages') 
 
 class ShellsorPebblesLoader(ImageFloderLoader):
     def __init__(self, batchSize=16, inputSize = 224*224, MisLabeledNoise = 0, seed = 0):
