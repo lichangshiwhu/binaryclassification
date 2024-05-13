@@ -8,21 +8,16 @@ momentum: 0.1
   # - LogisticAndWelschLoss
   # - LogisticAndSavageLoss
 criterion: 
-  - LogisticLoss
+  # - LogisticLoss
   - LogisticAndSigmoidLoss
-
+  
+  # - 0.50
+  # - 0.52
+  # - 0.54
 MisLabeledNoise:
-  - 0
-  - 0.08
-  - 0.16
-  - 0.24
-  - 0.32
-  - 0.40
-  - 0.48
   - 0.56
 
 noise: 0
-
 
 width: 0
 

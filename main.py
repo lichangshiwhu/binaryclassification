@@ -107,8 +107,8 @@ for rep in range(args.begin, args.end):
         set_seed(rep)
         globalVar._init()
         parameter['datasetSeed'] = rep
-        log.warningInfo("============== repeat: {} , width: {}, deep: {}, noises: {} =============="
-                        .format(rep, parameter["width"], parameter["deep"], parameter["noise"]))
+        log.warningInfo("============== repeat: {} , width: {}, deep: {}, MisLabeledNoise:{} =============="
+                        .format(rep, parameter["width"], parameter["deep"], parameter["MisLabeledNoise"]))
         recordsDict = train(parameter, log)
 
         prefixes = parametercombinations.getPrefix()

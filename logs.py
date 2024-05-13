@@ -77,7 +77,7 @@ class Records():
         'oracleLoss': np.inf,'oracleAccuracy': 0.0,
         'lastLoss': np.inf,'lastAccuracy': 0.0}
 
-    def update(self, epoch, evalLoss, testLoss, testAccuracy):
+    def update(self, epoch, evalLoss, testLoss, testAccuracy, eval_tolerance = 1e-5):
         self.resRecords['totalEpoch'] = epoch
         if self.lastEvalLoss > evalLoss:
             self.count = self.patience
@@ -104,6 +104,9 @@ class Records():
         if self.lastEpoch == epoch or self.count <= 0:
             self.resRecords['lastLoss'] = testLoss
             self.resRecords['lastAccuracy'] = testAccuracy
+        
+        if evalLoss <= eval_tolerance:
+            self.count = 0
 
     def getRecords(self):
         return self.resRecords
