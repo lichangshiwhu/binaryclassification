@@ -119,26 +119,34 @@ class BinaryMNISTLoader(AlldataLoader):
         self.test_dataset.targets[self.test_dataset.targets >= 5] = 1
 
 class ImageFloderLoader(AlldataLoader):
-    def  __init__(self, batchSize=16, inputSize = 224*224, MisLabeledNoise = 0, seed = 0, imagefolder = ''):
+    def  __init__(self, batchSize=16, inputSize = 224*224, MisLabeledNoise = 0, seed = 0, imagefolder = '', valimagefolder = ''):
         super(ImageFloderLoader, self).__init__(batchSize)
         # cannot identify image file: Dog/11702.jpg, Cat/666.jpg 
         # find and delete above pictrures 
         self.seed = seed
-        dataset = datasets.ImageFolder(imagefolder, transform = transform) 
+        train_x, train_y = self.get_imageandlabels(imagefolder)
+        if valimagefolder != '':
+            test_x, test_y = self.get_imageandlabels(valimagefolder)
+            self.train_dataset = makeClassifictionDataset(train_x, train_y)
+            self.test_dataset = makeClassifictionDataset(test_x, test_y)
+        else:
+            self.trainSamples = int(0.8 * len(train_y))
+            self.testSamples = len(train_y) - self.trainSamples
+            self.train_dataset = makeClassifictionDataset(train_x[:self.trainSamples], train_y[:self.trainSamples])
+            self.test_dataset = makeClassifictionDataset(train_x[self.trainSamples:], train_y[self.trainSamples:])
+        self.generateMislabeledData(MisLabeledNoise)
 
-        x = []
-        y = []
+    def get_imageandlabels(self, imagefloder):
+        dataset = datasets.ImageFolder(imagefloder, transform = transform) 
+
+        images = []
+        labels = []
         for path, label in dataset.samples:
             _x, _y  = read_image(path, label)
             if _x is not None:
-                x.append(_x)
-                y.append(_y)
-
-        self.trainSamples = int(0.8 * len(y))
-        self.testSamples = len(y) - self.trainSamples
-        self.train_dataset = makeClassifictionDataset(x[:self.trainSamples], y[:self.trainSamples])
-        self.test_dataset = makeClassifictionDataset(x[self.trainSamples:], y[self.trainSamples:])
-        self.generateMislabeledData(MisLabeledNoise)
+                images.append(_x)
+                labels.append(1 if _y == 1 else -1)
+        return images, labels
 
     def generateMislabeledData(self, MislabeledNoise = 0):
         if MislabeledNoise != 0:
@@ -158,6 +166,12 @@ class ShellsorPebblesLoader(ImageFloderLoader):
     def __init__(self, batchSize=16, inputSize = 224*224, MisLabeledNoise = 0, seed = 0):
         super(ShellsorPebblesLoader, self).__init__(batchSize=batchSize, inputSize = inputSize, MisLabeledNoise = MisLabeledNoise,
                                                seed = seed, imagefolder = './mydataset/archive') 
+
+class CactusAerialPhotosLoader(ImageFloderLoader):
+    def __init__(self, batchSize=16, inputSize = 224*224, MisLabeledNoise = 0, seed = 0):
+        super(CactusAerialPhotosLoader, self).__init__(batchSize=batchSize, inputSize = inputSize, MisLabeledNoise = MisLabeledNoise,
+                                               seed = seed, imagefolder = './mydataset/CactusAerialPhotos/training_set/training_set',
+                                                valimagefolder = './mydataset/CactusAerialPhotos/validation_set/validation_set') 
 
 class makeClassifictionDataset(torch.utils.data.Dataset):
     def __init__(self, x, y):
@@ -638,6 +652,9 @@ def getLoader(config):
     elif config['loaderName'] == 'ShellsorPebbles':
         ShellsorPebblesloader = ShellsorPebblesLoader(batchSize=config['batchSize'], inputSize = 224*224, MisLabeledNoise = config['MisLabeledNoise'], seed = config['datasetSeed'])
         return ShellsorPebblesloader.getLoader()
+    elif config['loaderName'] == 'CactusAerialPhotos':
+        CactusAerialPhotosloader = CactusAerialPhotosLoader(batchSize=config['batchSize'], inputSize = 224*224, MisLabeledNoise = config['MisLabeledNoise'], seed = config['datasetSeed'])
+        return CactusAerialPhotosloader.getLoader()
     elif config['loaderName'] == 'makeLinearClassifiction':
         makelinearclassifictionloader = makeLinearClassifictionLoader(config['batchSize'], config['trainSamples'], 
         config['testSamples'], config['inputSize'], config['datasetSeed'], config['outputSize'])

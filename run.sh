@@ -44,6 +44,8 @@ python main.py -F ./script240520/test_statlog_SigmoidLoss_width.yml -O statlog_S
 
 #run in pratical 
 python main.py -F ./script240520/test_catanddog.yml -O test_catanddog &
+python main.py -F ./script240520/test_ShellsorPebbles.yml -O test_ShellsorPebbles &
+python main.py -F ./script240520/test_CactusAerialPhotos.yml -O test_CactusAerialPhotos &
 
 wait
 
