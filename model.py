@@ -46,7 +46,7 @@ class ResNet18(nn.Module):
     def __init__(self, outputSize, **kwargs):
         super(ResNet18,self).__init__()
         self.outputSize = outputSize
-        self.resnet = resnet18(pretrained=False)
+        self.resnet = resnet18(pretrained=True)
         num_ftrs = self.resnet.fc.in_features  
         self.resnet.fc = nn.Linear(num_ftrs, self.outputSize)
 
