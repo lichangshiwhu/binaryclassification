@@ -118,13 +118,13 @@ class BinaryMNISTLoader(AlldataLoader):
         self.test_dataset.targets[self.test_dataset.targets < 5] = -1
         self.test_dataset.targets[self.test_dataset.targets >= 5] = 1
 
-class CatAndDogLoader(AlldataLoader):
-    def __init__(self, batchSize=16, inputSize = 224*224, MisLabeledNoise = 0, seed = 0):
-        super(CatAndDogLoader, self).__init__(batchSize)
+class ImageFloderLoader(AlldataLoader):
+    def  __init__(self, batchSize=16, inputSize = 224*224, MisLabeledNoise = 0, seed = 0, imagefolder = ''):
+        super(ImageFloderLoader, self).__init__(batchSize)
         # cannot identify image file: Dog/11702.jpg, Cat/666.jpg 
         # find and delete above pictrures 
         self.seed = seed
-        dataset = datasets.ImageFolder('./mydataset/kagglecatsanddogs_5340/PetImages', transform = transform) 
+        dataset = datasets.ImageFolder(imagefolder, transform = transform) 
 
         x = []
         y = []
@@ -133,12 +133,6 @@ class CatAndDogLoader(AlldataLoader):
             if _x is not None:
                 x.append(_x)
                 y.append(_y)
-        # _x, _y = load_images_in_parallel(dataset.samples, multiprocessing.cpu_count())
-        # random.seed(self.seed)
-        # indices = [i for i in range(len(_y))]
-        # random.shuffle(indices)
-        # x = [_x[i] for i in indices]  
-        # y = [_y[i] for i in indices] 
 
         self.trainSamples = int(0.8 * len(y))
         self.testSamples = len(y) - self.trainSamples
@@ -154,6 +148,16 @@ class CatAndDogLoader(AlldataLoader):
             indeices = index[0:noiseDataLen]
             for i in indeices:
                 self.train_dataset.y[i] = -1 * self.train_dataset.y[i]
+
+class CatAndDogLoader(ImageFloderLoader):
+    def __init__(self, batchSize=16, inputSize = 224*224, MisLabeledNoise = 0, seed = 0):
+        super(CatAndDogLoader, self).__init__(batchSize=batchSize, inputSize = inputSize, MisLabeledNoise = MisLabeledNoise,
+                                               seed = seed, imagefolder = './mydataset/kagglecatsanddogs_5340/PetImages') 
+
+class ShellsorPebblesLoader(ImageFloderLoader):
+    def __init__(self, batchSize=16, inputSize = 224*224, MisLabeledNoise = 0, seed = 0):
+        super(ShellsorPebblesLoader, self).__init__(batchSize=batchSize, inputSize = inputSize, MisLabeledNoise = MisLabeledNoise,
+                                               seed = seed, imagefolder = './mydataset/archive') 
 
 class makeClassifictionDataset(torch.utils.data.Dataset):
     def __init__(self, x, y):
@@ -631,6 +635,9 @@ def getLoader(config):
     elif config['loaderName'] == 'CatAndDog':
         catanddogloader = CatAndDogLoader(batchSize=config['batchSize'], inputSize = 224*224, MisLabeledNoise = config['MisLabeledNoise'], seed = config['datasetSeed'])
         return catanddogloader.getLoader()
+    elif config['loaderName'] == 'ShellsorPebbles':
+        ShellsorPebblesloader = ShellsorPebblesLoader(batchSize=config['batchSize'], inputSize = 224*224, MisLabeledNoise = config['MisLabeledNoise'], seed = config['datasetSeed'])
+        return ShellsorPebblesloader.getLoader()
     elif config['loaderName'] == 'makeLinearClassifiction':
         makelinearclassifictionloader = makeLinearClassifictionLoader(config['batchSize'], config['trainSamples'], 
         config['testSamples'], config['inputSize'], config['datasetSeed'], config['outputSize'])

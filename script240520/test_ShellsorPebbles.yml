@@ -5,17 +5,22 @@ modelName: ResNet18
 algorithm: ERM
 lr: 0.01
 momentum: 0.1
-  # - LogisticAndWelschLoss
-  # - LogisticAndSavageLoss
+
 criterion: 
   - LogisticLoss
   - LogisticAndSigmoidLoss
   
 MisLabeledNoise:
-  - 0.50
-  - 0.52
-  - 0.54
-  - 0.56
+  - 0
+  - 0.08
+  - 0.16
+  - 0.24
+  - 0.32
+  - 0.40
+  # - 0.50
+  # - 0.52
+  # - 0.54
+  # - 0.56
 
 noise: 0
 
@@ -35,7 +40,7 @@ trainSamples: 100
 
 testSamples: 100
 datasetSeed: 3
-loaderName: CatAndDog
+loaderName: ShellsorPebbles
 
 # parameters in main
 epochs: 200
@@ -46,4 +51,4 @@ file: rename
 
 # save
 SaveModelName: False
-device: cuda
+device: cpu
