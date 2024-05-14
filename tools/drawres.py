@@ -40,7 +40,7 @@ def draw_depth():
 
         ax.legend()
         if i % 3 == 0:
-            ax.set_ylabel('Accuracy', fontsize=15)  
+            ax.set_ylabel('Accuracy/%', fontsize=15)  
         ax.set_title(titles[i])  
         if i >= 2:
             ax.set_xlabel('depth', fontsize=15)
@@ -85,31 +85,6 @@ def draw_width():
     plt.show()
 
 #swap training strategy
-# linewidth = 2
-# file_path = 'output_swap.xlsx'
-# xls = pd.ExcelFile(file_path)
-# sheet_names = xls.sheet_names
-# titles = ['Breast Cancer', 'Statlog', 'Ionosphere', 'Congressional Voting Records', 'Musk', 'Early Stage Diabetes Risk Prediction']
-# fig, axs = plt.subplots(2, 3, sharex=True, figsize=(12, 6))
-# i = 0
-# x = [0, 0.08, 0.16, 0.24, 0.32, 0.40]
-# for ax in axs.flatten():
-#     if i >= 5:
-#         break
-#     arr =  pd.read_excel(xls, sheet_name=sheet_names[i]).values[:, 7].reshape(-1, 16)
-#     y = np.max(arr, axis=1)
-#     ax.plot(x, y, label='Sigmoid then logistic', linewidth = linewidth, linestyle='--')  
-
-#     ax.legend()
-#     ax.set_ylabel('Accuracy')  
-#     ax.set_title(titles[i])  
-#     if i >= 2:  
-#         ax.set_xlabel('depth')
-#     i += 1
-
-# plt.tight_layout()  
-# plt.show()
-
 def draw_noise_width35_depth10():
     linewidth = 2
     file_path = 'output_noise_width35_depth10.xlsx'
@@ -159,7 +134,7 @@ def draw_noise_width35_depth10():
     plt.tight_layout()  
     plt.show()
 
-
+#swap training strategy
 def draw_noise_width6_depth6():
     linewidth = 2
     file_path = 'output_noise_W6_D6.xlsx'
@@ -175,7 +150,7 @@ def draw_noise_width6_depth6():
     loss_numbers = len(loss_names)
     fig, axs = plt.subplots(2, 3, sharex=True, figsize=(12, 6))
     i = 0
-    x = [0, 0.08, 0.16, 0.24, 0.32, 0.40]
+    x = ["0", "8", "16", "24", "32", "40"]
     markers = ['o', 'v', 'x', 's', 'p', 'P']
 
     for ax in axs.flatten():
@@ -200,10 +175,11 @@ def draw_noise_width6_depth6():
                 ax.plot(x, y[j], label=loss_names[j], linewidth = linewidth, linestyle='dashdot', marker = markers[j], markersize=8)  
 
         ax.legend()
-        ax.set_ylabel('Accuracy')  
+        if i % 3 == 0:
+            ax.set_ylabel('Accuracy/%')  
         ax.set_title(titles[i])  
         if i >= 3:  
-            ax.set_xlabel('Depth')
+            ax.set_xlabel('The percentage of mislabeled sample/%')
         ax.grid(ls='--')
         i += 1
 
@@ -232,7 +208,8 @@ def draw_data_speed():
         ax.plot(x, sigmoid_max, label='Sigmoid loss', linewidth = linewidth, linestyle='dashdot', marker = markers[1], markersize=8)
         
         ax.legend()
-        ax.set_ylabel('Accuracy')  
+        if i == 0:
+            ax.set_ylabel('Accuracy/%')  
         ax.set_title(titles[i])  
         ax.set_xlabel('Data number')
         ax.grid(ls='--')
@@ -245,5 +222,5 @@ def draw_data_speed():
 # draw_depth()
 # draw_width()
 # draw_noise_width35_depth10()
-# draw_data_speed()
-draw_noise_width6_depth6()
+draw_data_speed()
+# draw_noise_width6_depth6()

@@ -51,4 +51,4 @@ file: rename
 
 # save
 SaveModelName: False
-device: cpu
+device: cuda
