@@ -218,9 +218,50 @@ def draw_data_speed():
     plt.tight_layout()  
     plt.show()
 
+def draw_image_noise_resnet18():
+    linewidth = 2
+    file_path = 'output_noise_resnet18.xlsx'
+    xls = pd.ExcelFile(file_path)
+    print(xls.sheet_names)
+    sheet_names = ['test_CactusAerialPhotos_']
+
+    titles = ['CactusAerialPhotos']
+    nn_numbers = [16, 16, 16, 16, 16, 16]
+    loss_names = ['Logistic loss', 'Sigmoid loss']
+    keep_loss = [1, 1]
+    loss_numbers = len(loss_names)
+    fig, axs = plt.subplots(1, 3, sharex=True, figsize=(12, 4))
+    i = 0
+    x = ["0", "8", "16", "24", "32", "40"]
+    markers = ['o', 'v', 'x', 's', 'p', 'P']
+
+    for ax in axs.flatten():
+        if i >= 1:
+            break
+        values =  pd.read_excel(xls, sheet_name=sheet_names[i]).values
+        all_acc = values[:, 4]
+        loss_acc = all_acc.reshape(-1, len(x))
+        assert loss_acc.shape[0] == len(loss_names)
+        for j in range(len(loss_names)):
+            if keep_loss[j]:
+                ax.plot(x, loss_acc[j], label=loss_names[j], linewidth = linewidth, linestyle='dashdot', marker = markers[j], markersize=8)  
+
+        ax.legend()
+        if i % 3 == 0:
+            ax.set_ylabel('Accuracy/%')  
+        ax.set_title(titles[i])  
+        if i >= 3:  
+            ax.set_xlabel('The percentage of mislabeled sample/%')
+        ax.grid(ls='--')
+        i += 1
+
+    plt.tight_layout()  
+    plt.show()
+
 # generate_expand_wd()
 # draw_depth()
 # draw_width()
 # draw_noise_width35_depth10()
-draw_data_speed()
+# draw_data_speed()
 # draw_noise_width6_depth6()
+draw_image_noise_resnet18()
