@@ -43,9 +43,10 @@ python main.py -F ./script240520/test_statlog_LogisticLoss_width.yml -O statlog_
 python main.py -F ./script240520/test_statlog_SigmoidLoss_width.yml -O statlog_SigmoidLoss_width &
 
 #run in pratical 
-python main.py -F ./script240520/test_catanddog.yml -O test_catanddog -B 0 -E 3 &
 python main.py -F ./script240520/test_ShellsorPebbles.yml -O test_ShellsorPebbles -B 0 -E 3 &
-python main.py -F ./script240520/test_CactusAerialPhotos.yml -O test_CactusAerialPhotos -B 0 -E 3 &
+
+# test run
+python main.py -F ./scriptstest/test_catanddog_scale.yml -O test_catanddog_scale -B 0 -E 3 &
 
 wait
 

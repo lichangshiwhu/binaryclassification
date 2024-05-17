@@ -33,26 +33,38 @@ class LogisticLoss(nn.Module):
         return res
 
 class SigmoidLoss(nn.Module):
+    def __init__(self, lossScale = 1):
+        super(SigmoidLoss, self).__init__()
+        self.lossScale = lossScale
+
     def forward(self, output, target):
         outputLen = len(output)
-        sigmoidloss = 2 * torch.sigmoid(-2 * torch.mul(output, target))
+        sigmoidloss = 2 * torch.sigmoid(-2 * self.lossScale * torch.mul(output, target))
         res = torch.sum(sigmoidloss) / outputLen
         return res
 
 class RampLoss(nn.Module):
-    def forward(self, output, target, s = -1):
+    def __init__(self, lossScale = -1):
+        super(SigmoidLoss, self).__init__()
+        self.lossScale = lossScale
+
+    def forward(self, output, target):
         outputLen = len(output)
         Yfx = torch.mul(output, target)
-        ramploss = F.relu(1 - Yfx) - F.relu(s - Yfx)
+        ramploss = F.relu(1 - Yfx) - F.relu(self.lossScale - Yfx)
         res = torch.sum(ramploss) / outputLen
         return res
 
 class WelschLoss(nn.Module):
-    def forward(self, output, target, c = 2):
+    def __init__(self, lossScale = 2):
+        super(SigmoidLoss, self).__init__()
+        self.lossScale = lossScale
+
+    def forward(self, output, target):
         outputLen = len(output)
         welschloss = output - target
-        welschloss = -welschloss * welschloss / (2 * c*c)
-        welschloss = (1 - torch.exp(welschloss))*c*c/2
+        welschloss = -welschloss * welschloss / (2 * self.lossScale * self.lossScale)
+        welschloss = (1 - torch.exp(welschloss))*self.lossScale*self.lossScale/2
         res = torch.sum(welschloss) / outputLen
         return res
 
@@ -79,10 +91,11 @@ class OvrSigmoidLoss(nn.Module):
         return res
 
 class LogisticAndSigmoidLoss(nn.Module):
-    def __init__(self):
+    def __init__(self, lossScale = 1, **kwargs):
         super(LogisticAndSigmoidLoss, self).__init__()
+        self.lossScale = lossScale
         self.logisticloss = LogisticLoss()
-        self.sigmoidloss = SigmoidLoss()
+        self.sigmoidloss = SigmoidLoss(self.lossScale)
 
     def forward(self, output, target):
         if globalVar.getValue('NextLoss') is False:
@@ -125,12 +138,13 @@ class LogisticAndWelschLoss(nn.Module):
 class SigmoidLossAndLogistic(nn.Module):
     def __init__(self):
         super(SigmoidLossAndLogistic, self).__init__()
+        self.k = 1
         self.logisticloss = LogisticLoss()
         self.sigmoidloss = SigmoidLoss()
 
     def forward(self, output, target):
         if globalVar.getValue('NextLoss') is False:
-            return self.sigmoidloss(output, target)
+            return self.sigmoidloss(output, target, self.k)
         return self.logisticloss(output, target)
 
 def getLoss(config):
@@ -151,7 +165,7 @@ def getLoss(config):
     elif config['criterion'] == 'CrossEntropyLoss':
         return nn.CrossEntropyLoss()
     elif config['criterion'] == 'LogisticAndSigmoidLoss':
-        return LogisticAndSigmoidLoss()
+        return LogisticAndSigmoidLoss(**config)
     elif config['criterion'] == 'LogisticAndSavageLoss':
         return LogisticAndSavageLoss()
     elif config['criterion'] == 'LogisticAndRampLoss':

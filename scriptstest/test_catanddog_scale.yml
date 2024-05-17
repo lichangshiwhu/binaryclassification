@@ -7,9 +7,11 @@ lr: 0.01
 momentum: 0.1
   # - LogisticAndWelschLoss
   # - LogisticAndSavageLoss
-criterion: 
-  - LogisticLoss
-  - LogisticAndSigmoidLoss
+criterion: LogisticAndSigmoidLoss
+lossScale:
+  - 0.5
+  - 2
+  - 3
 
 MisLabeledNoise:
   - 0
@@ -48,4 +50,4 @@ file: rename
 
 # save
 SaveModelName: False
-device: cuda
+device: cpu
