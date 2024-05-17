@@ -223,9 +223,9 @@ def draw_image_noise_resnet18():
     file_path = 'output_noise_resnet18.xlsx'
     xls = pd.ExcelFile(file_path)
     print(xls.sheet_names)
-    sheet_names = ['test_CactusAerialPhotos_']
+    sheet_names = ['test_catanddog_', 'test_CactusAerialPhotos_', 'test_ShellsorPebbles_']
 
-    titles = ['CactusAerialPhotos']
+    titles = ['catanddog', 'CactusAerialPhotos', 'ShellsorPebbles']
     nn_numbers = [16, 16, 16, 16, 16, 16]
     loss_names = ['Logistic loss', 'Sigmoid loss']
     keep_loss = [1, 1]
@@ -236,8 +236,6 @@ def draw_image_noise_resnet18():
     markers = ['o', 'v', 'x', 's', 'p', 'P']
 
     for ax in axs.flatten():
-        if i >= 1:
-            break
         values =  pd.read_excel(xls, sheet_name=sheet_names[i]).values
         all_acc = values[:, 4]
         loss_acc = all_acc.reshape(-1, len(x))
@@ -258,10 +256,43 @@ def draw_image_noise_resnet18():
     plt.tight_layout()  
     plt.show()
 
+def draw_image_noise_catus():
+    linewidth = 2
+    file_path = 'output_noise_resnet18.xlsx'
+    xls = pd.ExcelFile(file_path)
+    print(xls.sheet_names)
+    sheet_names = ['test_CactusAerialPhotos_']
+
+    titles = ['Cactus Aerial Photos']
+    nn_numbers = [16, 16, 16, 16, 16, 16]
+    loss_names = ['Logistic loss', 'Sigmoid loss']
+    keep_loss = [1, 1]
+    loss_numbers = len(loss_names)
+    i = 0
+    x = ["0", "8", "16", "24", "32", "40"]
+    markers = ['o', 'v', 'x', 's', 'p', 'P']
+
+    values =  pd.read_excel(xls, sheet_name=sheet_names[i]).values
+    all_acc = values[:, 4]
+    loss_acc = all_acc.reshape(-1, len(x))
+    assert loss_acc.shape[0] == len(loss_names)
+    for j in range(len(loss_names)):
+        if keep_loss[j]:
+            plt.plot(x[1:], loss_acc[j, 1:], label=loss_names[j], linewidth = linewidth, linestyle='dashdot', marker = markers[j], markersize=8)  
+
+    plt.legend()
+    plt.ylabel('Accuracy/%')  
+    plt.title(titles[i])  
+    plt.xlabel('The percentage of mislabeled sample/%')
+    plt.grid(ls='--')
+
+    plt.tight_layout()  
+    plt.show()
+
 # generate_expand_wd()
 # draw_depth()
 # draw_width()
 # draw_noise_width35_depth10()
 # draw_data_speed()
 # draw_noise_width6_depth6()
-draw_image_noise_resnet18()
+draw_image_noise_catus()
