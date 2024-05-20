@@ -57,7 +57,7 @@ class RampLoss(nn.Module):
 
 class WelschLoss(nn.Module):
     def __init__(self, lossScale = 2):
-        super(SigmoidLoss, self).__init__()
+        super(WelschLoss, self).__init__()
         self.lossScale = lossScale
 
     def forward(self, output, target):

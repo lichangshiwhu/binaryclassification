@@ -6,9 +6,9 @@ algorithm: ERM
 lr: 0.01
 momentum: 0.1
 
+  # - LogisticLoss
+  # - LogisticAndSigmoidLoss
 criterion: 
-  - LogisticLoss
-  - LogisticAndSigmoidLoss
   - LogisticAndWelschLoss
   - LogisticAndSavageLoss
 
