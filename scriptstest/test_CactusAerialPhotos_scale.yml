@@ -6,9 +6,11 @@ algorithm: ERM
 lr: 0.01
 momentum: 0.1
 
-criterion: 
-  - LogisticAndWelschLoss
-  - LogisticAndSavageLoss
+criterion: LogisticAndSigmoidLoss
+lossScale:
+  - 0.5
+  - 2
+  - 3
 
 MisLabeledNoise:
   - 0

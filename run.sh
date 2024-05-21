@@ -47,6 +47,8 @@ python main.py -F ./script240520/test_ShellsorPebbles.yml -O test_ShellsorPebble
 
 # test run
 python main.py -F ./scriptstest/test_catanddog_scale.yml -O test_catanddog_scale -B 0 -E 3 &
+python main.py -F ./script240520/test_CactusAerialPhotos.yml -O test_CactusAerialPhotos -B 0 -E 3 &
+python main.py -F ./scriptstest/test_CactusAerialPhotos_scale.yml -O test_CactusAerialPhotos_scale -B 0 -E 3 &
 
 wait
 
