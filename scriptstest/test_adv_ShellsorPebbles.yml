@@ -2,28 +2,27 @@
 modelName: ResNet18
 
 # algorithm parameters
-algorithm: ERM
+algorithm: PGD
 lr: 0.01
 momentum: 0.1
-  # - LogisticAndWelschLoss
-  # - LogisticAndSavageLoss
-criterion: LogisticAndSigmoidLoss
-lossScale:
-  - 0.1
-  - 0.2
-  - 0.3
-  - 0.4
+
+criterion: LogisticLoss
+lossScale: 1
+#   - 0.1
+#   - 0.2
+#   - 0.3
+#   - 0.4
   # - 0.5
   # - 2
   # - 3
 
-MisLabeledNoise:
-  - 0
-  - 0.08
-  - 0.16
-  - 0.24
-  - 0.32
-  - 0.40
+MisLabeledNoise: 0
+#   - 0
+#   - 0.08
+#   - 0.16
+#   - 0.24
+#   - 0.32
+#   - 0.40
 
 noise: 0
 
@@ -43,7 +42,7 @@ trainSamples: 100
 
 testSamples: 100
 datasetSeed: 3
-loaderName: CatAndDog
+loaderName: ShellsorPebbles
 
 # parameters in main
 epochs: 200
@@ -51,6 +50,19 @@ epochs: 200
 # print parameters
 interval: 2000
 file: rename
+
+# adversarial training parameters
+epsilon: 0.5
+
+alpha:
+ - 0.0001
+ - 0.001
+ - 0.01
+ - 0.1
+ - 0.25
+
+norm: inf
+iterations: 5
 
 # save
 SaveModelName: False

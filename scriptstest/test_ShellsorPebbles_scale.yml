@@ -5,8 +5,7 @@ modelName: ResNet18
 algorithm: ERM
 lr: 0.01
 momentum: 0.1
-  # - LogisticAndWelschLoss
-  # - LogisticAndSavageLoss
+
 criterion: LogisticAndSigmoidLoss
 lossScale:
   - 0.1
@@ -43,7 +42,7 @@ trainSamples: 100
 
 testSamples: 100
 datasetSeed: 3
-loaderName: CatAndDog
+loaderName: ShellsorPebbles
 
 # parameters in main
 epochs: 200

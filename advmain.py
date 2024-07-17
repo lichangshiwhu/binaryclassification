@@ -70,11 +70,13 @@ def train(config, log):
         assert totalData != 0
         loss /= totalData
         
-        evaluateDict = algorithm.evaluate(testLoader)
-        log.warningInfo('Epoch:{}, Train loss: {:.6f}, Val Loss {:.6f}, Val acc {:.4f}, NextLoss:{}'.format(
-            epoch, loss, evaluateDict['val_loss'], evaluateDict['val_accuracy'], globalVar.getValue('NextLoss')))
+        adv_evaluateDict = algorithm.evaluate(testLoader, is_adversarial=True)
+        nat_evaluateDict = algorithm.evaluate(testLoader, is_adversarial=False)
+        log.warningInfo('Epoch:{}, Train loss: {:.6f}, Adv Val Loss {:.6f}, Adv  Val acc {:.4f}, NextLoss:{}'.format(
+            epoch, loss, adv_evaluateDict['val_loss'], adv_evaluateDict['val_accuracy'],\
+                  nat_evaluateDict['val_loss'], nat_evaluateDict['val_accuracy'], globalVar.getValue('NextLoss')))
 
-        records.update(epoch, evaluateDict['val_loss'], evaluateDict['loss'], evaluateDict['accuracy'])
+        records.update(epoch, adv_evaluateDict['val_loss'], adv_evaluateDict['loss'], adv_evaluateDict['accuracy'], nat_evaluateDict['val_loss'], nat_evaluateDict['loss'], nat_evaluateDict['accuracy'])
 
         if records.EarlyStop():
             break
