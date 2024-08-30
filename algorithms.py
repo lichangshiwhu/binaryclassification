@@ -144,6 +144,8 @@ class PGD(ERM):
         return {"loss": test_loss, "accuracy": test_accuracy, "val_loss": val_loss, "val_accuracy": val_accuracy}
 
     def adversarialSamples(self, images, labels):
+        if self.alpha == 0:
+            return images
         # applies PGD to a batch of images
 
         adv = images.clone().detach().requires_grad_(True).to(self.device)
