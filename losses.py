@@ -45,7 +45,7 @@ class SigmoidLoss(nn.Module):
 
 class RampLoss(nn.Module):
     def __init__(self, lossScale = -1):
-        super(SigmoidLoss, self).__init__()
+        super(RampLoss, self).__init__()
         self.lossScale = lossScale
 
     def forward(self, output, target):
@@ -74,6 +74,20 @@ class SavageLoss(nn.Module):
         sigmoidloss = torch.sigmoid(-2 * torch.mul(output, target))
         sigmoidloss = sigmoidloss * sigmoidloss
         res = torch.sum(sigmoidloss) / outputLen
+        return res
+
+class FocalLoss(nn.Module):
+    def __init__(self, lossScale = 0, **kwargs):
+        super(FocalLoss, self).__init__()
+        self.lossScale = lossScale
+
+    def forward(self, output, target):
+        outputLen = len(output)
+        t = torch.mul(output, target)
+        logisitcloss = torch.log(torch.exp(-t) + 1)
+        weights = torch.sigmoid(-t) ** self.lossScale
+        focalloss = weights * logisitcloss
+        res = torch.sum(focalloss) / outputLen
         return res
 
 class OvrSigmoidLoss(nn.Module):
@@ -156,10 +170,10 @@ def getLoss(config):
         return HingeLoss()
     elif config['criterion'] == 'SquaredHingeLoss':
         return SquaredHingeLoss()
-    elif config['criterion'] == 'LeastSquareLoss':
-        return LeastSquareLoss()
     elif config['criterion'] == 'LogisticLoss':
         return LogisticLoss()
+    elif config['criterion'] == 'FocalLoss':
+        return FocalLoss(**config)
     elif config['criterion'] == 'OvrSigmoidLoss':
         return OvrSigmoidLoss()
     elif config['criterion'] == 'CrossEntropyLoss':

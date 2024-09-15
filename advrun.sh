@@ -1,8 +1,3 @@
-
-
-
-
-
 python advmain.py -F ./scriptstest/test_adv_ShellsorPebbles.yml -O test_adv_ShellsorPebbles -B 0 -E 3 &
 python advmain.py -F ./scriptstest/test_adv_ShellsorPebbles.yml -O test_adv_Sop_sigmoid -B 0 -E 3 &
 python advmain.py -F ./scriptstest/test_adv_ShellsorPebbles_alpha.yml -O test_adv_ShellsorPebbles_alpha -B 0 -E 3 &
@@ -20,6 +15,16 @@ python advmain.py -F ./scriptstest/test_adv_makeMoon.yml -O test_adv_makeMoon_nu
 
 
 # sigmoid loss under alpha
-python advmain.py -F ./scriptstest/test_adv_ShellsorPebbles_alpha.yml -O test_adv_ShellsorPebbles_alpha_sig -B 0 -E 3 
-python advmain.py -F ./scriptstest/test_adv_catanddog_alpha.yml -O test_adv_catanddog_alpha_sig -B 0 -E 3 
-python advmain.py -F ./scriptstest/test_adv_CactusAerialPhotos_alpha.yml -O test_adv_CactusAerialPhotos_alpha_sig -B 0 -E 3
+python advmain.py -F ./scriptstest/test_adv_CactusAerialPhotos_epsilon.yml -O test_adv_CactusAerialPhotos_epsilon -B 0 -E 3 ; python advmain.py -F ./scriptstest/test_adv_catanddog_epsilon.yml -O test_adv_catanddog_epsilon -B 0 -E 3  ; python advmain.py -F ./scriptstest/test_adv_ShellsorPebbles_epsilon.yml -O test_adv_ShellsorPebbles_epsilon -B 0 -E 3
+
+python advmain.py -F ./scriptstest/test_adv_catanddog_epsilon.yml -O test_adv_catanddog_epsilon_sig -B 0 -E 3  ; python advmain.py -F ./scriptstest/test_adv_ShellsorPebbles_epsilon.yml -O test_adv_ShellsorPebbles_epsilon_sig -B 0 -E 3
+
+# sigmoidloss
+# python advmain.py -F ./scriptstest/test_adv_CactusAerialPhotos.yml -O test_adv_cactusaerialphotos_sig_0p1_alpha -B 1 -E 3 ; python advmain.py -F ./scriptstest/test_adv_catanddog.yml -O test_adv_catanddog_sig_0p1_alpha -B 0 -E 3 ; python advmain.py -F ./scriptstest/test_adv_ShellsorPebbles.yml -O test_adv_ShellsorPebbles_sig_0p1_alpha -B 0 -E 3
+
+# toy test for margin
+# python advmain.py -F ./scriptstest/test_adv_makeCircleX2Y2_log_margin.yml -O test_adv_makeCircleX2Y2_log_margin -B 0 -E 5 ; python advmain.py -F ./scriptstest/test_adv_makeCircleX2Y2_sig_margin.yml -O test_adv_makeCircleX2Y2_sig_margin -B 0 -E 5 
+
+python advmain.py -F ./scriptstest/test_adv_makeCircleX2Y2_margin.yml -O test_adv_makeCircleX2Y2_margin -B 0 -E 5
+
+python advmain.py -F ./scriptstest/test_adv_makeByYeqX_margin.yml -O test_adv_makeByYeqX_margin -B 0 -E 10

@@ -671,6 +671,56 @@ class muskLoader(makeClassifictionLoader):
         label[index] = label
         return data, label
 
+class makeByYeqXLoader(makeClassifictionLoader):
+    def __init__(self, batchSize = 16, trainSamples = 3000, testSamples=57, nFeatures = 2, seed = 0, outputSize = 1, MisLabeledNoise = 0, margin=0.1):
+        assert nFeatures == 2
+        self.margin = margin
+        super(makeByYeqXLoader, self).__init__(batchSize, trainSamples, testSamples, nFeatures, seed, outputSize, 0, MisLabeledNoise)
+
+    def generate_dataset(self, size):
+        np.random.seed(self.seed)
+        data = np.empty((0, 2))
+        label = np.ones(size)
+
+        while data.shape[0] < size:
+            x = np.random.uniform(0, 1)
+            y = np.random.uniform(0, 1)
+            
+            distance = np.abs(x-y) / np.sqrt(2)
+            
+            if distance >= self.margin:
+                data = np.vstack((data, [x, y]))
+                if x < y:
+                    label[data.shape[0]-1] = -1
+        return data, label
+
+    def getMakeClassification(self):
+        data, label = self.generate_dataset(self.nSamples)
+        return data, label
+
+class makeCircleX2Y2Loader(makeByYeqXLoader):
+    def __init__(self, batchSize = 16, trainSamples = 3000, testSamples=57, nFeatures = 2, seed = 0, outputSize = 1, MisLabeledNoise = 0, margin=0.1):
+        assert nFeatures == 2
+        super(makeCircleX2Y2Loader, self).__init__(batchSize, trainSamples, testSamples, nFeatures, seed, outputSize, MisLabeledNoise, margin)
+
+    def generate_dataset(self, size):
+        np.random.seed(self.seed)
+        data = np.empty((0, 2))
+        label = np.ones(size)
+        r2 = 0.6
+        while data.shape[0] < size:
+            x = np.random.uniform(0, 1)
+            y = np.random.uniform(0, 1)
+            p = x * x + y * y
+
+            distance = np.abs(2 * (p - r2)) / (np.sqrt(4 * p + 1) + np.sqrt(4 * r2))
+
+            if distance >= self.margin:
+                data = np.vstack((data, [x, y]))
+                if p < r2:
+                    label[data.shape[0]-1] = -1
+        return data, label
+
 def getLoader(config):
     if config['loaderName'] == 'MNIST':
         config['inputSize'] = 784
@@ -703,6 +753,14 @@ def getLoader(config):
         makemoonloader = makeMoonLoader(config['batchSize'], config['trainSamples'], 
         config['testSamples'], config['inputSize'], config['datasetSeed'], config['outputSize'], config['noise'], config['MisLabeledNoise'])
         return makemoonloader.getLoader()
+    elif config['loaderName'] == 'makeByYeqX':
+        makeByYeqXloader = makeByYeqXLoader(batchSize=config['batchSize'], trainSamples=config['trainSamples'], 
+        testSamples=config['testSamples'], nFeatures=config['inputSize'], seed=config['datasetSeed'], outputSize=config['outputSize'], MisLabeledNoise=config['MisLabeledNoise'], margin=config['margin'])
+        return makeByYeqXloader.getLoader()
+    elif config['loaderName'] == 'makeCircleX2Y2':
+        makeCircleX2Y2loader = makeCircleX2Y2Loader(batchSize=config['batchSize'], trainSamples=config['trainSamples'], 
+        testSamples=config['testSamples'], nFeatures=config['inputSize'], seed=config['datasetSeed'], outputSize=config['outputSize'], MisLabeledNoise=config['MisLabeledNoise'], margin=config['margin'])
+        return makeCircleX2Y2loader.getLoader()
     elif config['loaderName'] == 'breastCancer':
         nSamples = 569
         config['trainSamples'] = int(nSamples * 0.8)

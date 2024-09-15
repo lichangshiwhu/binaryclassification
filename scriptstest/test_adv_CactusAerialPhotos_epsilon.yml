@@ -6,18 +6,18 @@ algorithm: PGD
 lr: 0.01
 momentum: 0.1
 
-criterion: LogisticAndSigmoidLoss
+criterion: FocalLoss
 
 # LogisticLoss
 # LogisticAndSigmoidLoss
-lossScale: 0.2
-#   - 0.4
-#   - 0.6
-#   - 0.8
-#   - 1
-#   - 2
-#   - 4
+lossScale:
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
 
+  # - 0
 
 MisLabeledNoise: 0
 #   - 0
@@ -55,29 +55,30 @@ interval: 2000
 file: rename
 
 # adversarial training parameters
-epsilon: 1
-alpha:
-  - 0.0
-  - 0.0002
-  - 0.0004
-  - 0.0006
-  - 0.0008
-  - 0.001
-  - 0.002
-  - 0.004
-  - 0.006
-  - 0.008
+epsilon:
   - 0.01
   - 0.02
   - 0.04
   - 0.06
   - 0.08
-  - 0.1
-  # - 0.2
-  # - 0.4
-  # - 0.6
-  # - 0.8
 
+alpha: 0.01
+  # - 0.0
+  # - 0.0002
+  # - 0.0004
+  # - 0.0006
+  # - 0.0008
+  # - 0.001
+  # - 0.002
+  # - 0.004
+  # - 0.006
+  # - 0.008
+  # - 0.01
+  # - 0.02
+  # - 0.04
+  # - 0.06
+  # - 0.08
+  # - 0.1
 
 norm: inf
 iterations: 5

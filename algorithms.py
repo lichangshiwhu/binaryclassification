@@ -169,7 +169,13 @@ class PGD(ERM):
             if self.norm in ["inf", np.inf]:
                 grad = grad.sign()
             elif self.norm == 2:
-                grad = grad / (torch.sqrt(torch.sum(grad * grad, dim=(1,2,3), keepdim=True)) + 10e-8)
+                if len(grad.shape) == 4:
+                    sum_grad2 = torch.sum(grad * grad, dim=(1,2,3), keepdim=True)
+                elif len(grad.shape) == 2:
+                    sum_grad2 = torch.sum(grad * grad, dim=(1), keepdim=True)
+                else:
+                    assert False
+                grad = grad / (torch.sqrt(sum_grad2) + 10e-8)
 
             assert(images.shape == grad.shape)
 
@@ -179,7 +185,6 @@ class PGD(ERM):
             # project current example back onto Lp ball
             if self.norm in ["inf", np.inf]:
                 adv = torch.max(torch.min(adv, images + self.eps), images - self.eps)
-
             elif self.norm == 2:
                 d = adv - images
                 mask = self.eps >= d.view(d.shape[0], -1).norm(self.norm, dim=1)

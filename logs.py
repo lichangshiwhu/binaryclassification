@@ -108,14 +108,14 @@ class Records():
             self.lastEvalLoss = np.inf
             self.count = self.patience
             globalVar.setValue('NextLoss', True)
+        
+        if evalLoss <= eval_tolerance:
+            self.count = self.patience if  globalVar.getValue('NextLoss') is False else 0
 
         if self.lastEpoch == epoch or self.count <= 0:
             self.resRecords['lastLoss'] = testLoss
             self.resRecords['lastAccuracy'] = testAccuracy
             self.update_direct('last_', remained_record_dict)
-        
-        if evalLoss <= eval_tolerance:
-            self.count = 0
 
     def getRecords(self):
         return self.resRecords

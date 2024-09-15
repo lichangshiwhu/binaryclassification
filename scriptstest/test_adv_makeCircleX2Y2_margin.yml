@@ -1,0 +1,89 @@
+# model parameters
+modelName: DNN
+
+# algorithm parameters
+algorithm: PGD
+lr: 0.01
+momentum: 0.1
+
+criterion: FocalLoss
+
+# LogisticLoss
+# LogisticAndSigmoidLoss
+lossScale:
+  - 3
+  # - 0
+  # - 1
+  # - 2
+  # - 4
+  # - 5
+
+MisLabeledNoise: 0
+
+noise: 0
+
+# is input features
+inputSize: 2
+
+width: 12
+deep: 3
+
+outputSize: 1
+tau: 1
+
+# dataset parameters
+batchSize: 16
+trainSamples: 5000
+
+testSamples: 1000
+datasetSeed: 3
+loaderName: makeCircleX2Y2
+margin:
+  - 0.15
+  - 0.25
+  - 0.35
+
+# parameters in main
+epochs: 200
+
+# print parameters
+interval: 2000
+file: rename
+
+epsilon:
+  - 0.1
+  - 0.1125
+  - 0.125
+  - 0.1375
+  - 0.15
+  - 0.1625
+  - 0.175
+  - 0.1875
+  - 0.2
+  - 0.2125
+  - 0.225
+  - 0.2375
+  - 0.25
+  - 0.2625
+  - 0.275
+  - 0.2875
+  - 0.3
+  - 0.3125
+  - 0.325
+  - 0.3375
+  - 0.35
+  - 0.3625
+  - 0.375
+  - 0.3875
+  - 0.4
+
+alpha:
+  - 0.08
+
+norm: inf
+iterations: 5
+# save
+SaveModelName: False
+device: cpu
+
+# makeByYeqX

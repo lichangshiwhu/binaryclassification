@@ -1,5 +1,5 @@
 # model parameters
-modelName: ResNet18
+modelName: DNN
 
 # algorithm parameters
 algorithm: PGD
@@ -20,32 +20,29 @@ lossScale:
   - 4
 
 MisLabeledNoise: 0
-#   - 0
-#   - 0.08
-#   - 0.16
-#   - 0.24
-#   - 0.32
-#   - 0.40
 
 noise: 0
 
-width: 0
-
-deep: 0
-
 # is input features
 inputSize: 2
+
+width: 12
+deep: 3
 
 outputSize: 1
 tau: 1
 
 # dataset parameters
 batchSize: 16
-trainSamples: 100
+trainSamples: 5000
 
-testSamples: 100
+testSamples: 1000
 datasetSeed: 3
-loaderName: ShellsorPebbles
+loaderName: makeCircleX2Y2
+margin:
+  - 0.15
+  - 0.25
+  - 0.35
 
 # parameters in main
 epochs: 200
@@ -54,14 +51,20 @@ epochs: 200
 interval: 2000
 file: rename
 
-# adversarial training parameters
-epsilon: 1
-# 0.5
-alpha: 0.01
+epsilon:
+  - 0.1
+  - 0.15
+  - 0.2
+  - 0.25
+  - 0.3
+  - 0.35
+  - 0.4
+
+alpha:
+  - 0.08
 
 norm: inf
 iterations: 5
-
 # save
 SaveModelName: False
-device: cuda
+device: cpu
