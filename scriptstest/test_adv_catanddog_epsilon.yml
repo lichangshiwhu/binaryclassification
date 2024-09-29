@@ -2,17 +2,20 @@
 modelName: ResNet18
 
 # algorithm parameters
-algorithm: PGD
+algorithm: 
+  - FGSM
+  - PGD
+
 lr: 0.01
 momentum: 0.1
 
 criterion: 
   - LogisticLoss
-  - FocalLoss
   - MAILLoss
   - SOVRLoss
   - LeastSquareLoss
   - HingeLoss
+  # - FocalLoss
 
 # lossScale:
   # - 0
@@ -85,7 +88,7 @@ alpha: 0.01
 
 
 norm: inf
-iterations: 5
+iterations: 30
 
 # save
 SaveModelName: False

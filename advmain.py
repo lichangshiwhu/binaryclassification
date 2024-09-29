@@ -51,7 +51,8 @@ def train(config, log):
             epoch, loss, adv_evaluateDict['val_loss'], adv_evaluateDict['val_accuracy'],\
                   nat_evaluateDict['val_loss'], nat_evaluateDict['val_accuracy'], globalVar.getValue('NextLoss')))
         #  the nat_val_loss is ther loss under the nautral validation set, may be useful in the furture
-        remained_record_dict = {'nat_val_loss': nat_evaluateDict['val_loss'], 'nat_loss':nat_evaluateDict['loss'], 'nat_accuracy':nat_evaluateDict['accuracy']}
+        remained_record_dict = {'nat_val_loss': nat_evaluateDict['val_loss'], 'nat_loss':nat_evaluateDict['loss'], 'nat_accuracy':nat_evaluateDict['accuracy'],\
+                                 'adv_eval_accuracy':adv_evaluateDict['val_accuracy'], 'nat_eval_accuracy':nat_evaluateDict['val_accuracy']}
         records.update(epoch, adv_evaluateDict['val_loss'], adv_evaluateDict['loss'], adv_evaluateDict['accuracy'], remained_record_dict=remained_record_dict)
 
         if records.EarlyStop():
@@ -98,6 +99,7 @@ for rep in range(args.begin, args.end):
         log.writeCSV("{},{},{}, {},{},{}, {},{},{}\n".format(
         recordsDict['eval_nat_val_loss'], recordsDict['eval_nat_loss'], recordsDict['eval_nat_accuracy'],
         recordsDict['oracle_nat_val_loss'], recordsDict['oracle_nat_loss'], recordsDict['oracle_nat_accuracy'],
-        recordsDict['last_nat_val_loss'], recordsDict['last_nat_loss'], recordsDict['last_nat_accuracy']
+        recordsDict['last_nat_val_loss'], recordsDict['last_nat_loss'], recordsDict['last_nat_accuracy'],
+        recordsDict['adv_eval_accuracy'], recordsDict['nat_eval_accuracy'],
         ))
     log.close()

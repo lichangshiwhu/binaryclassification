@@ -166,7 +166,7 @@ class ERM(torch.nn.Module):
 
 class FGSM(ERM):
     def __init__(self, config):
-        super(PGD, self).__init__(config)
+        super(FGSM, self).__init__(config)
         # epsilon, magnitude of perturbation, make sure to normalize to 0-1 range
         self.eps = config['epsilon']
 
@@ -221,26 +221,22 @@ class FGSM(ERM):
 
         adv = images.clone().detach().requires_grad_(True).to(self.device)
 
-        # run for desired number of iterations
-        for i in range(self.iterations):
-            _adv = adv.clone().detach().requires_grad_(True)
+        # predict on current perturbation + input
+        outputs = self.model(adv).squeeze(dim=1)
 
-            # predict on current perturbation + input
-            outputs = self.model(_adv).squeeze(dim=1)
+        # compute classification criterion
+        self.model.zero_grad()
+        cost = self.criterion(outputs, labels)
 
-            # compute classification criterion
-            self.model.zero_grad()
-            cost = self.criterion(outputs, labels)
+        # calculate gradient with respect to the input
+        cost.backward()
+        grad = adv.grad
+        grad_sign = torch.where(grad > 0, torch.ones_like(grad), torch.where(grad < 0, -torch.ones_like(grad), grad))
+        # take step in direction of gradient and apply to current example
+        adv = adv + grad_sign * self.eps
 
-            # calculate gradient with respect to the input
-            cost.backward()
-            grad = _adv.grad
-            grad_sign = torch.where(grad > 0, torch.ones_like(grad), torch.where(grad < 0, -torch.ones_like(grad), grad))
-            # take step in direction of gradient and apply to current example
-            adv = adv + grad_sign * self.eps
-
-            # clamp into 0-1 range
-            adv = adv.clamp(0.0, 1.0)
+        # clamp into 0-1 range
+        adv = adv.clamp(0.0, 1.0)
         self.model.zero_grad()
         # return adversarial example
         return adv.detach()

@@ -2,22 +2,22 @@
 modelName: ResNet18
 
 # algorithm parameters
-algorithm: PGD
+algorithm: 
+  - FGSM
+  - PGD
+
 lr: 0.01
 momentum: 0.1
 
-criterion: LogisticAndSigmoidLoss
+criterion: 
+  - FocalLoss
 
-# LogisticLoss
-# LogisticAndSigmoidLoss
 lossScale:
-  - 0.2
-  - 0.4
-  - 0.6
-  - 0.8
   - 1
   - 2
+  - 3
   - 4
+  - 5
 
 MisLabeledNoise: 0
 #   - 0
@@ -40,12 +40,12 @@ outputSize: 1
 tau: 1
 
 # dataset parameters
-batchSize: 16
+batchSize: 32
 trainSamples: 100
 
 testSamples: 100
 datasetSeed: 3
-loaderName: ShellsorPebbles
+loaderName: CatAndDog
 
 # parameters in main
 epochs: 200
@@ -55,13 +55,19 @@ interval: 2000
 file: rename
 
 # adversarial training parameters
-epsilon: 1
-# 0.5
+epsilon: 
+  - 0.01
+  - 0.02
+  - 0.04
+  - 0.06
+  - 0.08
+
 alpha: 0.01
 
 norm: inf
-iterations: 5
+iterations: 30
 
 # save
 SaveModelName: False
 device: cuda
+split: \#

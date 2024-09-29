@@ -185,8 +185,8 @@ def draw_image_best_margin():
     sheet_names = ['test_adv_catanddog_epsilon_', 'st_adv_ShellsorPebbles_epsilon_']
     markers = [ 'x','o','v', 's', 'p', 'P']
     fig, axs = plt.subplots(1, 2, figsize=(10, 5))
-    draw_acc_index = 13
-    y_label = 'Natural Accuracy/%'
+    draw_acc_index = 6
+    y_label = 'Adversarial Accuracy/%'
     # 'Adversarial Accuracy/%'
     # 'Natural Accuracy/%'
     # 6 -> adv acc
@@ -210,8 +210,8 @@ def draw_image_best_margin():
                 index_val_loss = new_nat_acc > nat_acc
                 nat_acc[index_val_loss] = new_nat_acc[index_val_loss]
             #  is best when scale is 1
-            if scale == 1:
-                nat_acc = subpd.values[beg_index:, draw_acc_index]
+            # if scale == 4:
+            #     nat_acc = subpd.values[beg_index:, draw_acc_index]
         ax.plot(subpd.values[beg_index:, 2], nat_acc, label='Focal Loss', linewidth = linewidth, linestyle='dashdot', marker = markers[1], markersize=8) 
         ax.legend()
         if i == 0:
