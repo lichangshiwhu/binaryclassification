@@ -77,7 +77,7 @@ class SavageLoss(nn.Module):
         return res
 
 class FocalLoss(nn.Module):
-    def __init__(self, lossScale = 0, **kwargs):
+    def __init__(self, lossScale = 1, **kwargs):
         super(FocalLoss, self).__init__()
         self.lossScale = lossScale
 
@@ -88,6 +88,52 @@ class FocalLoss(nn.Module):
         weights = torch.sigmoid(-t) ** self.lossScale
         focalloss = weights * logisitcloss
         res = torch.sum(focalloss) / outputLen
+        return res
+
+class MAILLoss(nn.Module):
+    def __init__(self, lossScale1 = 1, lossScale2 = 1, **kwargs):
+        super(MAILLoss, self).__init__()
+        self.lossScale1 = lossScale1
+        self.lossScale2 = lossScale2
+
+    def forward(self, output, target):
+        outputLen = len(output)
+        t = torch.mul(output, target)
+        prob = torch.sigmoid(t)
+
+        pm = 2 * prob - 1
+        weights = torch.sigmoid(-self.lossScale1*(pm - self.lossScale2))
+        sum_weights = torch.sum(weights)
+        weights = weights / sum_weights
+        # logisitc loss is the cross entrpy loss in binary classification
+        mailloss = weights * torch.log(torch.exp(-t) + 1)
+        res = torch.sum(mailloss) / outputLen
+        return res
+
+class SOVRLoss(nn.Module):
+    def __init__(self, lossScale1 = 1, lossScale2 = 50, **kwargs):
+        super(SOVRLoss, self).__init__()
+        # hyperparrameter to balance the loss
+        self.lossScale1 = lossScale1
+        # top M% data points in minibatch for uncertain classfication
+        # => the least M% data ponits in minibatch of probability  
+        self.lossScale2 = lossScale2
+
+    def forward(self, output, target):
+        outputLen = len(output)
+        t = torch.mul(output, target)
+        k = int(outputLen * self.lossScale2 * 0.01)
+        sum_loss2 = 0
+        mask = torch.ones_like(t)
+        if k != 0:
+            values, indices = torch.topk(t, k, largest=False)
+            loss2 = 2 * torch.log(torch.exp(values) + 1) - values
+            sum_loss2 = torch.sum(loss2)
+            mask[indices] = 0
+
+        loss1 = torch.log(torch.exp(-t) + 1)
+        loss1 = loss1 * mask
+        res = (torch.sum(loss1) + self.lossScale1 * sum_loss2) / outputLen
         return res
 
 class OvrSigmoidLoss(nn.Module):
@@ -161,7 +207,7 @@ class SigmoidLossAndLogistic(nn.Module):
             return self.sigmoidloss(output, target, self.k)
         return self.logisticloss(output, target)
 
-def getLoss(config):
+def getOneLoss(config):
     if config['criterion'] == 'SigmoidLoss':
         return SigmoidLoss()
     elif config['criterion'] == 'LeastSquareLoss':
@@ -174,6 +220,10 @@ def getLoss(config):
         return LogisticLoss()
     elif config['criterion'] == 'FocalLoss':
         return FocalLoss(**config)
+    elif config['criterion'] == 'MAILLoss':
+        return MAILLoss(**config)
+    elif config['criterion'] == 'SOVRLoss':
+        return SOVRLoss(**config)
     elif config['criterion'] == 'OvrSigmoidLoss':
         return OvrSigmoidLoss()
     elif config['criterion'] == 'CrossEntropyLoss':
@@ -189,3 +239,15 @@ def getLoss(config):
     elif config['criterion'] == 'SigmoidLossAndLogistic':
         return SigmoidLossAndLogistic()
     assert False
+
+def getLoss(config):
+    split = config['split']
+    if split not in config['criterion']:
+        return getOneLoss(config)
+    losses = config['criterion'].split(split)
+    temp_config = config
+    res = []
+    for loss in losses:
+        temp_config['criterion'] = loss
+        res.append(getOneLoss(temp_config))
+    return res

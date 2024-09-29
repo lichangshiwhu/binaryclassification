@@ -14,7 +14,6 @@ def generate_expand_wd():
             df = pd.DataFrame(arr)
             df.to_excel(writer, sheet_name=sheet_name, index=False)
 
-
 #convergence speed with data number
 def draw_data_speed():
     linewidth = 2
@@ -86,14 +85,15 @@ def draw_makeYByX_best_margin():
     import pandas as pd
     xls = pd.ExcelFile(file_path)
     margins = [0.15, 0.25, 0.35]
-    lossscale = [0, 1, 2, 3, 4, 5]
+    lossscale = [-1, -2, -3, 0, 1, 2, 3, 4, 5]
+    labels = ['Least Square Loss', 'Hinge Loss', 'Squared Hinge Loss', 'Logistic Loss']
     titles = ['Margin is 0.15', 'Margin is 0.25', 'Margin is 0.35']
 
     sheet_name = 'test_adv_makeByYeqX_margin_'
     markers = [ 'x','o','v', 's', 'p', 'P']
     fig, axs = plt.subplots(1, 3, sharex=True, figsize=(10, 3))
     pds = pd.read_excel(xls, sheet_name=sheet_name)
-    draw_acc_index = 15
+    draw_acc_index =  8
     y_label = 'Adversarial Accuracy/%'
     # 'Adversarial Accuracy/%'
     # 'Natural Accuracy/%'
@@ -106,8 +106,10 @@ def draw_makeYByX_best_margin():
         for j in range(len(lossscale)):
             scale = lossscale[j]
             subpd = pd[pd[1] == scale]
-            if j == 0:
-                ax.plot(subpd.values[beg_index:end_index, 3], subpd.values[beg_index:end_index, draw_acc_index], label='Logistic Loss', linewidth = linewidth, linestyle='dashdot', marker = markers[0], markersize=8) 
+            if scale <= 0:
+                if labels[j] == 'Squared Hinge Loss':
+                    continue
+                ax.plot(subpd.values[beg_index:end_index, 3], subpd.values[beg_index:end_index, draw_acc_index], label=labels[j], linewidth = linewidth, linestyle='dashdot', marker = markers[0], markersize=8) 
                 continue
             if nat_acc is None:
                 nat_acc =  subpd.values[beg_index:end_index, draw_acc_index]
@@ -115,6 +117,9 @@ def draw_makeYByX_best_margin():
                 new_nat_acc = subpd.values[beg_index:end_index, draw_acc_index]
                 index_val_loss = new_nat_acc > nat_acc
                 nat_acc[index_val_loss] = new_nat_acc[index_val_loss]
+            #  is best when scale is 1
+            if scale == 1:
+                nat_acc = subpd.values[beg_index:end_index, draw_acc_index]
         ax.plot(subpd.values[beg_index:end_index, 3], nat_acc, label='Focal Loss', linewidth = linewidth, linestyle='dashdot', marker = markers[1], markersize=8) 
         ax.legend()
         if i == 0:
@@ -135,6 +140,7 @@ def draw_makeYByX_margin():
     margins = [0.15, 0.25, 0.35]
     lossscale = [0, 1, 2, 3, 4, 5]
     titles = ['Cactus Aerial Photos', 'Cat and Dog', 'Shells or Pebbles']
+    labels = ['LeastSquareLoss', 'HingeLoss', 'SquaredHingeLoss', 'LogisticLoss']
 
     sheet_name = 'test_adv_makeByYeqX_margin_'
     markers = [ 'x','o','v', 's', 'p', 'P']
@@ -149,11 +155,102 @@ def draw_makeYByX_margin():
         nat_acc = None
         for j in range(len(lossscale)):
             scale = lossscale[j]
+            if scale <= 0:
+                label = labels[j]
+            else:
+                label = 'Focal Loss, alpha = ' + str(scale)
             subpd = pd[pd[1] == scale]
-            ax.plot(subpd.values[:, 3], subpd.values[:, draw_acc_index], label='Focal Loss, alpha = ' + str(scale), linewidth = linewidth, linestyle='dashdot', marker = markers[0], markersize=8) 
+            ax.plot(subpd.values[:, 3], subpd.values[:, draw_acc_index], label=label, linewidth = linewidth, linestyle='dashdot', marker = markers[0], markersize=8) 
         ax.legend()
         if i == 0:
             ax.set_ylabel('Accuracy/%')  
+        ax.set_title(titles[i])  
+        ax.set_xlabel('Noise Level')
+        ax.grid(ls='--')
+
+    plt.tight_layout()
+    plt.show()
+
+def draw_image_best_margin():
+    linewidth = 2
+    beg_index = 1
+    file_path = 'output_adv_image_alpha.xlsx'
+    import pandas as pd
+    # xls = pd.ExcelFile(file_path)
+    lossscale = [-1, -2, -3, -4, -5,  0, 1, 2, 3, 4, 5]
+    labels = ['Least Square Loss', 'Hinge Loss', 'Squared Hinge Loss', 'MAIL Loss', 'SOVR Loss', 'Logistic Loss']
+    # 'Cactus Aerial Photos', 
+    titles = ['Cat and Dog', 'Shells or Pebbles']
+    # 'adv_CactusAerialPhotos_epsilon_', 
+    sheet_names = ['test_adv_catanddog_epsilon_', 'st_adv_ShellsorPebbles_epsilon_']
+    markers = [ 'x','o','v', 's', 'p', 'P']
+    fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+    draw_acc_index = 13
+    y_label = 'Natural Accuracy/%'
+    # 'Adversarial Accuracy/%'
+    # 'Natural Accuracy/%'
+    # 6 -> adv acc
+    # 13 -> nat acc
+    for i in range(len(sheet_names)):
+        ax = axs[i]
+        pad = pd.read_excel(file_path, sheet_name=sheet_names[i])
+        nat_acc = None
+        for j in range(len(lossscale)):
+            scale = lossscale[j]
+            subpd = pad[pad[1] == scale]
+            if scale <= 0:
+                if labels[j] == 'Squared Hinge Loss':
+                    continue
+                ax.plot(subpd.values[beg_index:, 2], subpd.values[beg_index:, draw_acc_index], label=labels[j], linewidth = linewidth, linestyle='dashdot', marker = markers[0], markersize=8) 
+                continue
+            if nat_acc is None:
+                nat_acc =  subpd.values[beg_index:, draw_acc_index]
+            else:
+                new_nat_acc = subpd.values[beg_index:, draw_acc_index]
+                index_val_loss = new_nat_acc > nat_acc
+                nat_acc[index_val_loss] = new_nat_acc[index_val_loss]
+            #  is best when scale is 1
+            if scale == 1:
+                nat_acc = subpd.values[beg_index:, draw_acc_index]
+        ax.plot(subpd.values[beg_index:, 2], nat_acc, label='Focal Loss', linewidth = linewidth, linestyle='dashdot', marker = markers[1], markersize=8) 
+        ax.legend()
+        if i == 0:
+            ax.set_ylabel(y_label)
+        ax.set_title(titles[i])  
+        ax.set_xlabel('Noise Level')
+        ax.grid(ls='--')
+
+    plt.tight_layout()
+    plt.show()
+
+def draw_image_margin():
+    linewidth = 2
+    beg_index = 0
+    file_path = 'output_adv_image_alpha.xlsx'
+    import pandas as pd
+    # xls = pd.ExcelFile(file_path)
+    lossscale = [0, 1, 2, 3, 4, 5]
+    titles = ['Cactus Aerial Photos', 'Cat and Dog', 'Shells or Pebbles']
+
+    sheet_names = ['adv_CactusAerialPhotos_epsilon_', 'test_adv_catanddog_epsilon_', 'st_adv_ShellsorPebbles_epsilon_']
+    markers = [ 'x','o','v', 's', 'p', 'P']
+    fig, axs = plt.subplots(1, 3, sharex=True, figsize=(10, 3))
+    draw_acc_index = 13
+    y_label = 'Natural Accuracy/%'
+    # 'Adversarial Accuracy/%'
+    # 'Natural Accuracy/%'
+    # 6 -> adv acc
+    # 13 -> nat acc
+    for i in range(3):
+        ax = axs[i]
+        pad = pd.read_excel(file_path, sheet_name=sheet_names[i])
+        for j in range(len(lossscale)):
+            scale = lossscale[j]
+            subpd = pad[pad[1] == scale]
+            ax.plot(subpd.values[beg_index:, 2], subpd.values[beg_index:, draw_acc_index], label='Logistic Loss', linewidth = linewidth, linestyle='dashdot', marker = markers[j], markersize=8) 
+        ax.legend()
+        if i == 0:
+            ax.set_ylabel(y_label)
         ax.set_title(titles[i])  
         ax.set_xlabel('Noise Level')
         ax.grid(ls='--')
@@ -247,4 +344,8 @@ def draw_makeYByX_res():
 # draw_nat_siglog()
 # draw_makeYByX_res()
 # draw_circlex2y2()
-draw_makeYByX_best_margin()
+# draw_makeYByX_margin()
+# draw_image_margin()
+
+# draw_makeYByX_best_margin()
+draw_image_best_margin()

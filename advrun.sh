@@ -27,4 +27,11 @@ python advmain.py -F ./scriptstest/test_adv_catanddog_epsilon.yml -O test_adv_ca
 
 python advmain.py -F ./scriptstest/test_adv_makeCircleX2Y2_margin.yml -O test_adv_makeCircleX2Y2_margin -B 0 -E 5
 
-python advmain.py -F ./scriptstest/test_adv_makeByYeqX_margin.yml -O test_adv_makeByYeqX_margin -B 0 -E 10
+python advmain.py -F ./scriptstest/test_adv_makeByYeqX_margin.yml -O test_adv_makeByYeqX_margin_nn -B 0 -E 10
+
+python advmain.py -F ./scriptstest/test_adv_catanddog_epsilon.yml -O test_adv_catanddog_epsilon_baseline_iter30 -B 0 -E 3  ; python advmain.py -F ./scriptstest/test_adv_ShellsorPebbles_epsilon.yml -O test_adv_ShellsorPebbles_epsilon_baseline_iter30 -B 0 -E 3 ; python advmain.py -F ./scriptstest/test_adv_CactusAerialPhotos_epsilon.yml -O test_adv_CactusAerialPhotos_epsilon_baseline_iter30 -B 0 -E 3
+
+python advmain.py -F ./scriptstest/test_adv_makeByYeqX_margin.yml -O test_adv_makeByYeqX_margin_sovr -B 0 -E 10
+
+python advmain.py -F ./scriptstest/test_adv_catanddog_epsilon.yml -O test_adv_catanddog_epsilon_baseline_mail_sovr -B 0 -E 3  ; python advmain.py -F ./scriptstest/test_adv_ShellsorPebbles_epsilon.yml -O test_adv_ShellsorPebbles_epsilon_baseline_mail_sovr -B 0 -E 3 ; python advmain.py -F ./scriptstest/test_adv_CactusAerialPhotos_epsilon.yml -O test_adv_CactusAerialPhotos_epsilon_baseline_mail_sovr -B 0 -E 3
+

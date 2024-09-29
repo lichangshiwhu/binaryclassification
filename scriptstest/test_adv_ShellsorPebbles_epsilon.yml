@@ -6,17 +6,21 @@ algorithm: PGD
 lr: 0.01
 momentum: 0.1
 
-criterion: FocalLoss
+criterion: 
+  - LogisticLoss
+  - FocalLoss
+  - MAILLoss
+  - SOVRLoss
+  - LeastSquareLoss
+  - HingeLoss
 
-# LogisticLoss
-# LogisticAndSigmoidLoss
-lossScale:
-  - 1
-  - 2
-  - 3
-  - 4
-  - 5
-# - 0
+# lossScale:
+  # - 0
+  # - 1
+  # - 2
+  # - 3
+  # - 4
+  # - 5
 
 MisLabeledNoise: 0
 #   - 0
@@ -70,3 +74,4 @@ iterations: 5
 # save
 SaveModelName: False
 device: cuda
+split: \#

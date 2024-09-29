@@ -6,17 +6,34 @@ algorithm: PGD
 lr: 0.01
 momentum: 0.1
 
-criterion: FocalLoss
+criterion: 
+  - SOVRLoss
 
+  # - MAILLoss
+# FocalLoss
 # LogisticLoss
 # LogisticAndSigmoidLoss
-lossScale:
-  - 0
+# lossScale:
+#   - 0
+  # - 1
+  # - 2
+  # - 3
+  # - 4
+  # - 5
+
+lossScale1:
   - 1
   - 2
   - 3
   - 4
   - 5
+
+lossScale2:
+  - 10
+  - 20
+  - 30
+  - 40
+  - 50
 
 MisLabeledNoise: 0
 
@@ -38,7 +55,8 @@ trainSamples: 5000
 testSamples: 1000
 datasetSeed: 3
 loaderName: makeByYeqX
-margin:
+margin: 
+  - 0.25
   - 0.15
   - 0.25
   - 0.35
