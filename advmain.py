@@ -96,10 +96,12 @@ for rep in range(args.begin, args.end):
         recordsDict['evalLoss'], recordsDict['evalAccuracy'], 
         recordsDict['oracleLoss'], recordsDict['oracleAccuracy'], 
         recordsDict['lastLoss'], recordsDict['lastAccuracy']))
-        log.writeCSV("{},{},{}, {},{},{}, {},{},{}\n".format(
+        log.writeCSV("{},{},{}, {},{},{}, {},{},{}, {},{},{}, {},{},{}\n".format(
         recordsDict['eval_nat_val_loss'], recordsDict['eval_nat_loss'], recordsDict['eval_nat_accuracy'],
         recordsDict['oracle_nat_val_loss'], recordsDict['oracle_nat_loss'], recordsDict['oracle_nat_accuracy'],
         recordsDict['last_nat_val_loss'], recordsDict['last_nat_loss'], recordsDict['last_nat_accuracy'],
-        recordsDict['adv_eval_accuracy'], recordsDict['nat_eval_accuracy'],
+        recordsDict['eval_adv_eval_accuracy'], recordsDict['eval_nat_eval_accuracy'],
+        recordsDict['oracle_adv_eval_accuracy'], recordsDict['oracle_nat_eval_accuracy'],
+        recordsDict['last_adv_eval_accuracy'], recordsDict['last_nat_eval_accuracy'],
         ))
     log.close()

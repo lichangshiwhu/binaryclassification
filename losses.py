@@ -85,7 +85,11 @@ class FocalLoss(nn.Module):
         outputLen = len(output)
         t = torch.mul(output, target)
         logisitcloss = torch.log(torch.exp(-t) + 1)
-        weights = torch.sigmoid(-t) ** self.lossScale
+        if self.lossScale >= 0:
+            weights = torch.sigmoid(-t) ** self.lossScale
+        else:
+            # smooth
+            weights = (torch.sigmoid(-t) + 1) ** self.lossScale
         focalloss = weights * logisitcloss
         res = torch.sum(focalloss) / outputLen
         return res

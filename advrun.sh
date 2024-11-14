@@ -33,4 +33,5 @@ python advmain.py -F ./scriptstest/test_adv_catanddog_epsilon.yml -O test_adv_ca
 
 python advmain.py -F ./scriptstest/test_adv_makeByYeqX_margin.yml -O test_adv_makeByYeqX_margin_sovr -B 0 -E 10
 
-python advmain.py -F ./scriptstest/test_adv_catanddog_epsilon.yml -O test_adv_catanddog_epsilon -B 0 -E 3  ; python advmain.py -F ./scriptstest/test_adv_ShellsorPebbles_epsilon.yml -O test_adv_ShellsorPebbles_epsilon -B 0 -E 3 ; python advmain.py -F ./scriptstest/test_adv_catanddog_focal.yml -O test_adv_catanddog_focal -B 0 -E 3  ; python advmain.py -F ./scriptstest/test_adv_ShellsorPebbles_focal.yml -O test_adv_ShellsorPebbles_focal -B 0 -E 3
+python advmain.py -F ./scriptstest/test_adv_catanddog_epsilon.yml -O test_adv_catanddog_epsilon -B 0 -E 3  ; python advmain.py -F ./scriptstest/test_adv_ShellsorPebbles_epsilon.yml -O test_adv_ShellsorPebbles_epsilon -B 0 -E 3 ; 
+python advmain.py -F ./scriptstest/test_adv_catanddog_focal.yml -O test_adv_catanddog_neg_focal -B 0 -E 3  ; python advmain.py -F ./scriptstest/test_adv_ShellsorPebbles_focal.yml -O test_adv_ShellsorPebbles_neg_focal -B 0 -E 3

@@ -339,6 +339,36 @@ def draw_makeYByX_res():
     plt.tight_layout()
     plt.show()
 
+# y_label = 'Natural Accuracy/%', draw_index=13
+# y_label = 'Adversarial Accuracy/%', draw_index=6
+def draw_alg(alg_name='FGSM', y_label = 'Adversarial Accuracy/%', draw_index=6):
+    linewidth = 2
+    beg_index = 1
+    titles = ['Cat and Dog', 'Shells or Pebbles']
+    file_path = 'output_adv_image_epsilon.xlsx'
+    sheet_names = ['st_adv_catanddog_epsilon__mean', '_ShellsorPebbles_epsilon__mean']
+    markers = [ 'x','o','v', 's', 'p', 'P', 'h', 'H', 'X', 'd', 'D', '|', '_']
+    df_labels = ['LogisticLoss', 'MAILLoss', 'SOVRLoss', 'HingeLoss', 'LogisticLoss', 'FocalLoss']
+    labels = ['Logistic Loss', 'MAIL Loss', 'SOVR Loss', 'Hinge Loss', 'Logistic Loss', 'Focal Loss']
+    fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+    for i in range(len(sheet_names)):
+        ax = axs[i]
+        df = pd.read_excel(file_path, sheet_name=sheet_names[i])
+        for j in range(len(df_labels)):
+            filtered_df = df[(df.iloc[:, 0] == alg_name) & (df.iloc[:, 1] == df_labels[j])]
+            ax.plot(filtered_df.values[beg_index:, 2], filtered_df.values[beg_index:, draw_index], label=labels[j], linewidth = linewidth, linestyle='dashdot', marker = markers[j], markersize=8) 
+        ax.legend()
+        if i == 0:
+            ax.set_ylabel(y_label)
+        ax.set_title(titles[i])  
+        ax.set_xlabel('Noise Level')
+        ax.grid(ls='--')
+
+    plt.tight_layout()
+    plt.show()
+
+
+
 # draw_data_speed()
 # draw_makeYByX()
 # draw_nat_siglog()
@@ -348,4 +378,6 @@ def draw_makeYByX_res():
 # draw_image_margin()
 
 # draw_makeYByX_best_margin()
-draw_image_best_margin()
+# draw_image_best_margin()
+
+draw_alg()
